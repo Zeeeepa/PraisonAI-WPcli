@@ -13,13 +13,27 @@ AI-powered WordPress content management framework with precision editing capabil
 
 ## Installation
 
+### Using uv (Recommended - 10x faster!)
+
 ```bash
-pip install praisonaiwp
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and install
+git clone https://github.com/yourusername/praisonaiwp
+cd praisonaiwp
+uv sync
+
+# Run commands
+uv run praisonaiwp init
 ```
 
-Or install from source:
+### Using pip
 
 ```bash
+pip install praisonaiwp
+
+# Or install from source
 git clone https://github.com/yourusername/praisonaiwp
 cd praisonaiwp
 pip install -e .

@@ -2,6 +2,19 @@
 
 ## Installation
 
+### Using uv (Recommended)
+
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install project
+cd praisonaiwp
+uv sync
+```
+
+### Using pip
+
 ```bash
 cd praisonaiwp
 pip install -e .

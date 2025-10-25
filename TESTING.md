@@ -4,13 +4,30 @@
 
 ### Install Test Dependencies
 
+**Using uv (Recommended):**
+
+```bash
+uv sync --extra dev
+```
+
+**Or using pip:**
+
 ```bash
 pip install -e ".[dev]"
 ```
 
 ### Run All Tests
 
+**Using uv:**
+
 ```bash
+uv run pytest
+```
+
+**Or with activated venv:**
+
+```bash
+source .venv/bin/activate
 pytest
 ```
 

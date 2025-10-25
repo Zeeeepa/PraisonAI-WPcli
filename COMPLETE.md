@@ -74,6 +74,19 @@ praisonaiwp/
 
 ### 1. Install PraisonAIWP
 
+**Using uv (Recommended - 10x faster!):**
+
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install project
+cd /Users/praison/crawler/praisonaiwp
+uv sync
+```
+
+**Or using pip:**
+
 ```bash
 cd /Users/praison/crawler/praisonaiwp
 pip install -e .
