@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Example: Bulk update 9 language pages
+Example: Bulk update 9 pages
 
 This example demonstrates the real-world use case of updating
-9 multilingual church pages with different headings at line 10.
+9 pages with different headings at line 10.
 """
 
 from praisonaiwp.core.config import Config
@@ -12,17 +12,17 @@ from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.editors.content_editor import ContentEditor
 
 
-# Configuration: 9 language pages
+# Configuration: 9 pages
 UPDATES = [
-    {"post_id": 116, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Tamil Church"},
-    {"post_id": 117, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Hindi Church"},
-    {"post_id": 118, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Malayalam Church"},
-    {"post_id": 119, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Telugu Church"},
-    {"post_id": 120, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Sinhala Church"},
-    {"post_id": 121, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Kannada Church"},
-    {"post_id": 122, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Gujarati Church"},
-    {"post_id": 139, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough Asian Church"},
-    {"post_id": 140, "line": 10, "find": "A Multicultural Church Community", "replace": "Peterborough English Church"},
+    {"post_id": 116, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 1"},
+    {"post_id": 117, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 2"},
+    {"post_id": 118, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 3"},
+    {"post_id": 119, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 4"},
+    {"post_id": 120, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 5"},
+    {"post_id": 121, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 6"},
+    {"post_id": 122, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 7"},
+    {"post_id": 139, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 8"},
+    {"post_id": 140, "line": 10, "find": "Old Website Title", "replace": "New Title for Page 9"},
 ]
 
 

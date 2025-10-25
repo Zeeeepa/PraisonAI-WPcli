@@ -16,8 +16,8 @@ def main():
     # Configuration
     POST_ID = 123  # Change this to your post ID
     LINE_NUMBER = 10  # Line to update
-    FIND_TEXT = "Welcome to Our Church"
-    REPLACE_TEXT = "Peterborough Tamil Church"
+    FIND_TEXT = "Welcome to Our Site"
+    REPLACE_TEXT = "My Website Title"
     
     # Load configuration
     config = Config()

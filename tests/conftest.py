@@ -41,7 +41,7 @@ def sample_post_content():
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This is a multicultural community.</p>
+<p>This is a sample website.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
