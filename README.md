@@ -10,6 +10,7 @@ AI-powered WordPress content management framework with precision editing capabil
 - 🔒 **Safe** - Auto-backup, preview mode, dry-run capabilities
 - 🌐 **Multi-Server** - Manage multiple WordPress installations
 - 📝 **Smart** - Auto-detects file formats and optimal settings
+- 🔑 **SSH Config Support** - Use `~/.ssh/config` host aliases
 
 ## Installation
 

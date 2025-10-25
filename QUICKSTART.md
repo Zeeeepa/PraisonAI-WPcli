@@ -28,6 +28,8 @@ praisonaiwp init
 
 Follow the prompts to configure your WordPress server.
 
+**💡 Tip:** If you have `~/.ssh/config` set up, just enter your host alias (e.g., `wp-prod`) and PraisonAIWP will automatically load username, key, and port from your SSH config!
+
 ## Usage Examples
 
 ### 1. Create a Single Post

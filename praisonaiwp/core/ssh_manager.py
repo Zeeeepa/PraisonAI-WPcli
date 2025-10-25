@@ -1,6 +1,8 @@
 """SSH connection management for PraisonAIWP"""
 
+import os
 import paramiko
+from pathlib import Path
 from typing import Optional, Tuple
 from praisonaiwp.utils.logger import get_logger
 from praisonaiwp.utils.exceptions import SSHConnectionError
@@ -14,29 +16,72 @@ class SSHManager:
     def __init__(
         self,
         hostname: str,
-        username: str,
-        key_file: str,
+        username: Optional[str] = None,
+        key_file: Optional[str] = None,
         port: int = 22,
-        timeout: int = 30
+        timeout: int = 30,
+        use_ssh_config: bool = True
     ):
         """
         Initialize SSH Manager
         
         Args:
-            hostname: Server hostname or IP
-            username: SSH username
-            key_file: Path to SSH private key
-            port: SSH port (default: 22)
+            hostname: Server hostname, IP, or SSH config alias
+            username: SSH username (optional if in SSH config)
+            key_file: Path to SSH private key (optional if in SSH config)
+            port: SSH port (default: 22, overridden by SSH config)
             timeout: Connection timeout in seconds (default: 30)
+            use_ssh_config: Whether to use ~/.ssh/config (default: True)
         """
-        self.hostname = hostname
-        self.username = username
-        self.key_file = key_file
-        self.port = port
+        self.original_hostname = hostname
+        self.use_ssh_config = use_ssh_config
+        
+        # Load SSH config if enabled
+        ssh_config = self._load_ssh_config() if use_ssh_config else {}
+        
+        # Apply SSH config values with fallbacks
+        self.hostname = ssh_config.get('hostname', hostname)
+        self.username = username or ssh_config.get('user')
+        self.key_file = key_file or ssh_config.get('identityfile', [None])[0]
+        self.port = ssh_config.get('port', port)
         self.timeout = timeout
         self.client: Optional[paramiko.SSHClient] = None
         
-        logger.debug(f"Initialized SSHManager for {username}@{hostname}:{port}")
+        # Expand ~ in key_file path
+        if self.key_file:
+            self.key_file = os.path.expanduser(self.key_file)
+        
+        logger.debug(f"Initialized SSHManager for {self.username}@{self.hostname}:{self.port}")
+        if use_ssh_config and ssh_config:
+            logger.debug(f"Using SSH config for host: {self.original_hostname}")
+    
+    def _load_ssh_config(self) -> dict:
+        """
+        Load SSH configuration from ~/.ssh/config
+        
+        Returns:
+            Dictionary of SSH config values for the hostname
+        """
+        ssh_config_path = Path.home() / '.ssh' / 'config'
+        
+        if not ssh_config_path.exists():
+            logger.debug("SSH config file not found")
+            return {}
+        
+        try:
+            ssh_config = paramiko.SSHConfig()
+            with open(ssh_config_path) as f:
+                ssh_config.parse(f)
+            
+            # Lookup config for this host
+            host_config = ssh_config.lookup(self.original_hostname)
+            
+            logger.debug(f"Loaded SSH config for {self.original_hostname}")
+            return host_config
+        
+        except Exception as e:
+            logger.warning(f"Failed to load SSH config: {e}")
+            return {}
     
     def connect(self) -> "SSHManager":
         """

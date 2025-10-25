@@ -198,3 +198,193 @@ Update post
 
 **Version**: 1.0.0  
 **Last Updated**: October 2025
+
+
+✅ SIMPLIFIED CLI STRUCTURE
+1️⃣ Setup (One-time)
+bash
+# Initialize with interactive prompts
+praisonaiwp init
+
+# Asks:
+# - Server hostname?
+# - SSH username?
+# - SSH key path? (default: ~/.ssh/id_ed25519)
+# - WordPress path? (auto-detects)
+# - PHP binary? (auto-detects)
+
+# That's it! Saved to ~/.praisonaiwp/config.yaml
+2️⃣ Create Posts
+bash
+# Single post (interactive)
+praisonaiwp create
+# Prompts for: title, content, status
+
+# Single post (direct)
+praisonaiwp create "My Post Title" --content "Post content"
+
+# From file (auto-detects format: JSON, YAML, CSV)
+praisonaiwp create posts.json
+
+# 100 posts? Same command! Auto-parallel if >10 posts
+praisonaiwp create 100_posts.json
+# Automatically uses parallel mode for speed ⚡
+3️⃣ Update Posts
+bash
+# Interactive mode
+praisonaiwp update 123
+# Shows current content, asks what to change
+
+# Direct replacement
+praisonaiwp update 123 "old text" "new text"
+
+# Specific line
+praisonaiwp update 123 "old text" "new text" --line 10
+
+# Nth occurrence
+praisonaiwp update 123 "old text" "new text" --nth 2
+
+# Preview first (always safe)
+praisonaiwp update 123 "old text" "new text" --preview
+4️⃣ Find
+bash
+# Find in post
+praisonaiwp find 123 "search text"
+
+# Find across all posts
+praisonaiwp find "search text"
+5️⃣ List
+bash
+# List all posts
+praisonaiwp list
+
+# List pages
+praisonaiwp list --type page
+
+# List with search
+praisonaiwp list --search "church"
+🎯 EVEN SIMPLER: Natural Language Style
+bash
+# Create
+praisonaiwp "create a post titled 'Hello World'"
+praisonaiwp "create 100 posts from posts.json"
+
+# Update
+praisonaiwp "update post 123 replace 'old' with 'new' on line 10"
+praisonaiwp "update post 123 change the 2nd occurrence of 'old' to 'new'"
+
+# Find
+praisonaiwp "find 'church' in post 123"
+praisonaiwp "show me all posts with 'church'"
+
+# List
+praisonaiwp "list all pages"
+praisonaiwp "show me published posts"
+🏆 RECOMMENDED: Hybrid Approach
+Simple commands + Smart defaults + Natural language fallback
+
+Core Commands (5 only):
+bash
+praisonaiwp init              # Setup (one-time)
+praisonaiwp create [file]     # Create posts
+praisonaiwp update <id>       # Update posts
+praisonaiwp find <pattern>    # Search
+praisonaiwp list              # List posts
+Smart Defaults:
+Auto-detects file format (JSON/YAML/CSV)
+Auto-uses parallel mode for bulk (>10 posts)
+Auto-backups before updates
+Auto-preview for destructive operations
+Auto-connects to default server
+Example Usage:
+bash
+# Setup once
+praisonaiwp init
+
+# Create single post
+praisonaiwp create "My Post" --content "Hello World"
+
+# Create 100 posts (auto-parallel!)
+praisonaiwp create posts.json
+# Output: Creating 100 posts in parallel... Done in 8s ⚡
+
+# Update specific line
+praisonaiwp update 123 "old" "new" --line 10
+# Output: Preview changes? [Y/n]
+#         Line 10: "old heading" → "new heading"
+#         Apply? [Y/n]
+
+# Find text
+praisonaiwp find "church"
+# Output: Found in 9 posts:
+#         - Post 116 (line 10, 55)
+#         - Post 117 (line 10)
+#         ...
+Comparison: Before vs After
+❌ BEFORE (Too Complex):
+bash
+praisonaiwp bulk create \
+  --server production \
+  --file posts.json \
+  --mode parallel \
+  --workers 10 \
+  --backup \
+  --dry-run
+✅ AFTER (Simple):
+bash
+praisonaiwp create posts.json
+# Auto-detects: bulk, auto-parallel, auto-backup, auto-preview
+File Format (Super Simple)
+posts.json
+json
+[
+  {
+    "title": "Tamil Church in Peterborough",
+    "content": "<p>Welcome...</p>"
+  },
+  {
+    "title": "Hindi Church in Peterborough",
+    "content": "<p>Welcome...</p>"
+  }
+]
+updates.json
+json
+[
+  {
+    "id": 116,
+    "line": 10,
+    "find": "Old Heading",
+    "replace": "New Heading"
+  },
+  {
+    "id": 117,
+    "line": 10,
+    "find": "Old Heading",
+    "replace": "Different Heading"
+  }
+]
+🎯 Final Recommendation
+Use this simplified structure:
+
+bash
+# 5 core commands only
+praisonaiwp init
+praisonaiwp create [file|title]
+praisonaiwp update <id> [find] [replace]
+praisonaiwp find <pattern>
+praisonaiwp list
+
+# Smart flags (optional)
+--line <num>        # Update specific line
+--nth <num>         # Update nth occurrence
+--preview           # Preview changes
+--no-backup         # Skip backup
+--server <name>     # Use different server
+Benefits:
+
+✅ Only 5 commands to remember
+✅ Smart defaults (no need to specify mode, workers, etc.)
+✅ Auto-detects everything
+✅ Interactive when needed
+✅ Safe by default (preview, backup)
+✅ Fast automatically (parallel for bulk)
