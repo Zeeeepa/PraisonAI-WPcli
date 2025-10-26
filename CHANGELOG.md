@@ -84,5 +84,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smart file format detection (JSON, YAML, CSV)
 - Rich CLI output with colors and progress bars
 
-[1.0.1]: https://github.com/yourusername/praisonaiwp/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/yourusername/praisonaiwp/releases/tag/v1.0.0
+[1.0.1]: https://github.com/MervinPraison/praisonaiwp/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/MervinPraison/praisonaiwp/releases/tag/v1.0.0

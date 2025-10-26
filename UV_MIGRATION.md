@@ -264,7 +264,7 @@ jobs:
 
 1. **Clone and setup**:
    ```bash
-   git clone https://github.com/yourusername/praisonaiwp
+   git clone https://github.com/MervinPraison/praisonaiwp
    cd praisonaiwp
    uv sync --extra dev
    ```

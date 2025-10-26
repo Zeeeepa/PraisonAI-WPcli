@@ -209,5 +209,5 @@ ssh user@hostname "which wp"
 
 ## Support
 
-- GitHub Issues: https://github.com/yourusername/praisonaiwp/issues
+- GitHub Issues: https://github.com/MervinPraison/praisonaiwp/issues
 - Documentation: https://praisonaiwp.readthedocs.io

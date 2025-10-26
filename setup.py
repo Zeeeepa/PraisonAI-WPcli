@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Praison",
     author_email="your.email@example.com",
-    url="https://github.com/yourusername/praisonaiwp",
+    url="https://github.com/MervinPraison/praisonaiwp",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

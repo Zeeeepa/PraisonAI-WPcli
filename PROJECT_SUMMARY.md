@@ -251,8 +251,8 @@ This framework was built to solve the real problem of:
 
 ## 📞 Support
 
-- GitHub: https://github.com/yourusername/praisonaiwp
-- Issues: https://github.com/yourusername/praisonaiwp/issues
+- GitHub: https://github.com/MervinPraison/praisonaiwp
+- Issues: https://github.com/MervinPraison/praisonaiwp/issues
 - Docs: https://praisonaiwp.readthedocs.io
 
 ---

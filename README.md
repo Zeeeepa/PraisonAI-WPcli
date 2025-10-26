@@ -29,7 +29,7 @@ AI-powered WordPress content management framework with precision editing capabil
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and install
-git clone https://github.com/yourusername/praisonaiwp
+git clone https://github.com/MervinPraison/praisonaiwp
 cd praisonaiwp
 uv sync
 
@@ -43,7 +43,7 @@ uv run praisonaiwp init
 pip install praisonaiwp
 
 # Or install from source
-git clone https://github.com/yourusername/praisonaiwp
+git clone https://github.com/MervinPraison/praisonaiwp
 cd praisonaiwp
 pip install -e .
 ```
@@ -333,7 +333,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical documentation.
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/praisonaiwp
+git clone https://github.com/MervinPraison/praisonaiwp
 cd praisonaiwp
 
 # Install in development mode

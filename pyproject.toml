@@ -49,10 +49,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/praisonaiwp"
+Homepage = "https://github.com/MervinPraison/praisonaiwp"
 Documentation = "https://praisonaiwp.readthedocs.io"
-Repository = "https://github.com/yourusername/praisonaiwp"
-Issues = "https://github.com/yourusername/praisonaiwp/issues"
+Repository = "https://github.com/MervinPraison/praisonaiwp"
+Issues = "https://github.com/MervinPraison/praisonaiwp/issues"
 
 [project.scripts]
 praisonaiwp = "praisonaiwp.cli.main:cli"
