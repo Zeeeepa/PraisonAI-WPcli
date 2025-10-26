@@ -366,6 +366,6 @@ Praison
 
 ## Links
 
-- GitHub: https://github.com/yourusername/praisonaiwp
+- GitHub: https://github.com/MervinPraison/PraisonAIWP
 - Documentation: https://praisonaiwp.readthedocs.io
 - PyPI: https://pypi.org/project/praisonaiwp
