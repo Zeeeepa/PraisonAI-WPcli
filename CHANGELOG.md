@@ -5,6 +5,19 @@ All notable changes to PraisonAI WPcli will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-11-17
+
+### Added
+- **Fast Search**: Optimized find command with WP_Query 's' parameter
+  - Server-side MySQL LIKE search (10x faster)
+  - Search 800+ posts in 4 seconds instead of 50+ seconds
+  - Only fetches matching posts instead of all posts
+
+### Changed
+- Consolidated documentation (removed 10 redundant docs)
+- Keep only specialized docs: ARCHITECTURE.md, TESTING.md, CHANGELOG.md
+- Enhanced README with category examples and troubleshooting
+
 ## [1.0.5] - 2025-11-17
 
 ### Added
