@@ -7,6 +7,7 @@ from praisonaiwp.cli.commands.create import create_command
 from praisonaiwp.cli.commands.update import update_command
 from praisonaiwp.cli.commands.find import find_command
 from praisonaiwp.cli.commands.list import list_command
+from praisonaiwp.cli.commands.category import category_command
 from praisonaiwp.cli.commands.install_wp_cli import install_wp_cli
 from praisonaiwp.cli.commands.find_wordpress import find_wordpress
 
@@ -47,6 +48,7 @@ cli.add_command(create_command, name='create')
 cli.add_command(update_command, name='update')
 cli.add_command(find_command, name='find')
 cli.add_command(list_command, name='list')
+cli.add_command(category_command, name='category')
 
 
 if __name__ == '__main__':

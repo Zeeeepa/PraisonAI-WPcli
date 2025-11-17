@@ -13,6 +13,40 @@ console = Console()
 logger = get_logger(__name__)
 
 
+def _parse_category_input(category_str, category_id_str, wp):
+    """
+    Parse category input and return list of category IDs
+    
+    Args:
+        category_str: Comma-separated category names/slugs
+        category_id_str: Comma-separated category IDs
+        wp: WPClient instance
+        
+    Returns:
+        List of category IDs
+    """
+    category_ids = []
+    
+    if category_id_str:
+        # Parse category IDs
+        try:
+            category_ids = [int(cid.strip()) for cid in category_id_str.split(',')]
+        except ValueError:
+            raise click.ClickException("Invalid category ID format. Must be comma-separated integers.")
+    
+    elif category_str:
+        # Parse category names/slugs
+        category_names = [name.strip() for name in category_str.split(',')]
+        
+        for name in category_names:
+            cat = wp.get_category_by_name(name)
+            if not cat:
+                raise click.ClickException(f"Category '{name}' not found")
+            category_ids.append(int(cat['term_id']))
+    
+    return category_ids
+
+
 @click.command()
 @click.argument('post_id', type=int)
 @click.argument('find_text', required=False)
@@ -20,8 +54,10 @@ logger = get_logger(__name__)
 @click.option('--line', type=int, help='Update specific line number')
 @click.option('--nth', type=int, help='Update nth occurrence')
 @click.option('--preview', is_flag=True, help='Preview changes without applying')
+@click.option('--category', help='Comma-separated category names/slugs')
+@click.option('--category-id', help='Comma-separated category IDs')
 @click.option('--server', default=None, help='Server name from config')
-def update_command(post_id, find_text, replace_text, line, nth, preview, server):
+def update_command(post_id, find_text, replace_text, line, nth, preview, category, category_id, server):
     """
     Update WordPress post content
     
@@ -36,6 +72,9 @@ def update_command(post_id, find_text, replace_text, line, nth, preview, server)
         # Update 2nd occurrence
         praisonaiwp update 123 "old text" "new text" --nth 2
         
+        # Update categories only
+        praisonaiwp update 123 --category "RAG,AI"
+        
         # Preview changes
         praisonaiwp update 123 "old text" "new text" --preview
     """
@@ -45,9 +84,9 @@ def update_command(post_id, find_text, replace_text, line, nth, preview, server)
         config = Config()
         server_config = config.get_server(server)
         
-        # Validate inputs
-        if not find_text or not replace_text:
-            console.print("[red]Error: Both find_text and replace_text are required[/red]")
+        # Validate inputs - either content update or category update
+        if not (find_text and replace_text) and not (category or category_id):
+            console.print("[red]Error: Either (find_text and replace_text) or (--category/--category-id) is required[/red]")
             raise click.Abort()
         
         console.print(f"\n[yellow]Fetching post {post_id}...[/yellow]")
@@ -69,46 +108,70 @@ def update_command(post_id, find_text, replace_text, line, nth, preview, server)
             # Get current content
             try:
                 post_data = wp.get_post(post_id)
-                current_content = wp.get_post(post_id, field='post_content')
-            except Exception as e:
+            except Exception:
                 console.print(f"[red]Error: Post {post_id} not found[/red]")
                 raise click.Abort()
             
-            # Apply replacement based on options
-            editor = ContentEditor()
+            # Handle content update if find/replace provided
+            if find_text and replace_text:
+                current_content = wp.get_post(post_id, field='post_content')
+                
+                # Apply replacement based on options
+                editor = ContentEditor()
+                
+                if line:
+                    console.print(f"[cyan]Replacing at line {line}...[/cyan]")
+                    new_content = editor.replace_at_line(current_content, line, find_text, replace_text)
+                elif nth:
+                    console.print(f"[cyan]Replacing occurrence #{nth}...[/cyan]")
+                    new_content = editor.replace_nth_occurrence(current_content, find_text, replace_text, nth)
+                else:
+                    console.print("[cyan]Replacing all occurrences...[/cyan]")
+                    new_content = current_content.replace(find_text, replace_text)
+                
+                # Show preview
+                changes = _show_preview(current_content, new_content)
+                
+                if not changes:
+                    console.print("[yellow]No changes to apply[/yellow]")
+                    return
+                
+                if preview:
+                    console.print("\n[yellow]Preview mode - no changes applied[/yellow]")
+                    return
+                
+                # Confirm changes
+                if not Confirm.ask("\n[bold]Apply these changes?[/bold]", default=True):
+                    console.print("[yellow]Update cancelled[/yellow]")
+                    return
+                
+                # Apply content changes
+                console.print("\n[yellow]Updating post content...[/yellow]")
+                wp.update_post(post_id, post_content=new_content)
             
-            if line:
-                console.print(f"[cyan]Replacing at line {line}...[/cyan]")
-                new_content = editor.replace_at_line(current_content, line, find_text, replace_text)
-            elif nth:
-                console.print(f"[cyan]Replacing occurrence #{nth}...[/cyan]")
-                new_content = editor.replace_nth_occurrence(current_content, find_text, replace_text, nth)
-            else:
-                console.print("[cyan]Replacing all occurrences...[/cyan]")
-                new_content = current_content.replace(find_text, replace_text)
-            
-            # Show preview
-            changes = _show_preview(current_content, new_content)
-            
-            if not changes:
-                console.print("[yellow]No changes to apply[/yellow]")
-                return
-            
-            if preview:
-                console.print("\n[yellow]Preview mode - no changes applied[/yellow]")
-                return
-            
-            # Confirm changes
-            if not Confirm.ask("\n[bold]Apply these changes?[/bold]", default=True):
-                console.print("[yellow]Update cancelled[/yellow]")
-                return
-            
-            # Apply changes
-            console.print("\n[yellow]Updating post...[/yellow]")
-            wp.update_post(post_id, post_content=new_content)
-            
-            console.print(f"[green]✓ Post {post_id} updated successfully[/green]")
-            console.print(f"Title: {post_data.get('post_title', 'N/A')}\n")
+            # Update categories if provided
+            if category or category_id:
+                console.print("\n[yellow]Updating categories...[/yellow]")
+                category_ids = _parse_category_input(category, category_id, wp)
+                if category_ids:
+                    wp.set_post_categories(post_id, category_ids)
+                    
+                    # Get category names for display
+                    category_names = []
+                    for cid in category_ids:
+                        cat = wp.get_category_by_id(cid)
+                        if cat:
+                            category_names.append(cat['name'])
+                    
+                    console.print(f"[green]✓ Post {post_id} updated successfully[/green]")
+                    console.print(f"Title: {post_data.get('post_title', 'N/A')}")
+                    console.print(f"Categories: {', '.join(category_names)}\n")
+                else:
+                    console.print(f"[green]✓ Post {post_id} updated successfully[/green]")
+                    console.print(f"Title: {post_data.get('post_title', 'N/A')}\n")
+            elif find_text and replace_text:
+                console.print(f"[green]✓ Post {post_id} updated successfully[/green]")
+                console.print(f"Title: {post_data.get('post_title', 'N/A')}\n")
     
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")

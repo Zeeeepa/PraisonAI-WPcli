@@ -16,13 +16,49 @@ console = Console()
 logger = get_logger(__name__)
 
 
+def _parse_category_input(category_str, category_id_str, wp):
+    """
+    Parse category input and return list of category IDs
+    
+    Args:
+        category_str: Comma-separated category names/slugs
+        category_id_str: Comma-separated category IDs
+        wp: WPClient instance
+        
+    Returns:
+        List of category IDs
+    """
+    category_ids = []
+    
+    if category_id_str:
+        # Parse category IDs
+        try:
+            category_ids = [int(cid.strip()) for cid in category_id_str.split(',')]
+        except ValueError:
+            raise click.ClickException("Invalid category ID format. Must be comma-separated integers.")
+    
+    elif category_str:
+        # Parse category names/slugs
+        category_names = [name.strip() for name in category_str.split(',')]
+        
+        for name in category_names:
+            cat = wp.get_category_by_name(name)
+            if not cat:
+                raise click.ClickException(f"Category '{name}' not found")
+            category_ids.append(int(cat['term_id']))
+    
+    return category_ids
+
+
 @click.command()
 @click.argument('title_or_file', required=False)
 @click.option('--content', help='Post content')
 @click.option('--status', default='publish', help='Post status (publish, draft, private)')
 @click.option('--type', 'post_type', default='post', help='Post type (post, page)')
+@click.option('--category', help='Comma-separated category names/slugs')
+@click.option('--category-id', help='Comma-separated category IDs')
 @click.option('--server', default=None, help='Server name from config')
-def create_command(title_or_file, content, status, post_type, server):
+def create_command(title_or_file, content, status, post_type, category, category_id, server):
     """
     Create WordPress posts
     
@@ -33,6 +69,9 @@ def create_command(title_or_file, content, status, post_type, server):
         
         # Single post
         praisonaiwp create "My Post" --content "Hello World"
+        
+        # With categories
+        praisonaiwp create "My Post" --content "Hello" --category "RAG,AI"
         
         # From file (auto-detects format)
         praisonaiwp create posts.json
@@ -64,6 +103,8 @@ def create_command(title_or_file, content, status, post_type, server):
                 content,
                 status,
                 post_type,
+                category,
+                category_id,
                 server_config
             )
     
@@ -73,7 +114,7 @@ def create_command(title_or_file, content, status, post_type, server):
         raise click.Abort()
 
 
-def _create_single_post(title, content, status, post_type, server_config):
+def _create_single_post(title, content, status, post_type, category, category_id, server_config):
     """Create a single post"""
     
     if not content:
@@ -103,9 +144,31 @@ def _create_single_post(title, content, status, post_type, server_config):
             post_type=post_type
         )
         
-        console.print(f"[green]✓ Created {post_type} ID: {post_id}[/green]")
-        console.print(f"Title: {title}")
-        console.print(f"Status: {status}\n")
+        # Set categories if provided
+        if category or category_id:
+            category_ids = _parse_category_input(category, category_id, wp)
+            if category_ids:
+                wp.set_post_categories(post_id, category_ids)
+                
+                # Get category names for display
+                category_names = []
+                for cid in category_ids:
+                    cat = wp.get_category_by_id(cid)
+                    if cat:
+                        category_names.append(cat['name'])
+                
+                console.print(f"[green]✓ Created {post_type} ID: {post_id}[/green]")
+                console.print(f"Title: {title}")
+                console.print(f"Status: {status}")
+                console.print(f"Categories: {', '.join(category_names)}\n")
+            else:
+                console.print(f"[green]✓ Created {post_type} ID: {post_id}[/green]")
+                console.print(f"Title: {title}")
+                console.print(f"Status: {status}\n")
+        else:
+            console.print(f"[green]✓ Created {post_type} ID: {post_id}[/green]")
+            console.print(f"Title: {title}")
+            console.print(f"Status: {status}\n")
 
 
 def _create_from_file(file_path, server_config, config):

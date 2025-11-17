@@ -136,3 +136,102 @@ class TestWPClient:
         call_args = mock_ssh.execute.call_args[0][0]
         # Should escape single quotes
         assert "'\\''" in call_args or "\\'" in call_args
+    
+    def test_set_post_categories(self, wp_client, mock_ssh):
+        """Test setting post categories"""
+        mock_ssh.execute.return_value = ("Success", "")
+        
+        result = wp_client.set_post_categories(123, [1, 2, 3])
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--post_category=1,2,3" in call_args
+    
+    def test_add_post_category(self, wp_client, mock_ssh):
+        """Test adding a category to post"""
+        mock_ssh.execute.return_value = ("Success", "")
+        
+        result = wp_client.add_post_category(123, 5)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post term add 123 category 5" in call_args
+    
+    def test_remove_post_category(self, wp_client, mock_ssh):
+        """Test removing a category from post"""
+        mock_ssh.execute.return_value = ("Success", "")
+        
+        result = wp_client.remove_post_category(123, 1)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post term remove 123 category 1" in call_args
+    
+    def test_list_categories(self, wp_client, mock_ssh):
+        """Test listing categories"""
+        import json
+        categories = [
+            {"term_id": "1", "name": "Uncategorized", "slug": "uncategorized", "parent": "0", "count": "5"},
+            {"term_id": "2", "name": "News", "slug": "news", "parent": "0", "count": "10"}
+        ]
+        mock_ssh.execute.return_value = (json.dumps(categories), "")
+        
+        result = wp_client.list_categories()
+        
+        assert result == categories
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term list category" in call_args
+        assert "--format=json" in call_args
+    
+    def test_list_categories_with_search(self, wp_client, mock_ssh):
+        """Test searching categories"""
+        import json
+        categories = [{"term_id": "2", "name": "News", "slug": "news", "parent": "0", "count": "10"}]
+        mock_ssh.execute.return_value = (json.dumps(categories), "")
+        
+        result = wp_client.list_categories(search="News")
+        
+        assert result == categories
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term list category" in call_args
+        assert '--search="News"' in call_args
+    
+    def test_get_post_categories(self, wp_client, mock_ssh):
+        """Test getting categories for a post"""
+        import json
+        categories = [
+            {"term_id": "1", "name": "Uncategorized", "slug": "uncategorized", "parent": "0"},
+            {"term_id": "2", "name": "News", "slug": "news", "parent": "0"}
+        ]
+        mock_ssh.execute.return_value = (json.dumps(categories), "")
+        
+        result = wp_client.get_post_categories(123)
+        
+        assert result == categories
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post term list 123 category" in call_args
+    
+    def test_get_category_by_name(self, wp_client, mock_ssh):
+        """Test getting category by name"""
+        import json
+        category = {"term_id": "2", "name": "News", "slug": "news", "parent": "0"}
+        mock_ssh.execute.return_value = (json.dumps(category), "")
+        
+        result = wp_client.get_category_by_name("news")
+        
+        assert result == category
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term get category 'news'" in call_args
+    
+    def test_get_category_by_id(self, wp_client, mock_ssh):
+        """Test getting category by ID"""
+        import json
+        category = {"term_id": "2", "name": "News", "slug": "news", "parent": "0"}
+        mock_ssh.execute.return_value = (json.dumps(category), "")
+        
+        result = wp_client.get_category_by_id(2)
+        
+        assert result == category
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term get category 2" in call_args

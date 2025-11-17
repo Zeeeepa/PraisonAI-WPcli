@@ -292,3 +292,154 @@ class WPClient:
             cmd += " --dry-run"
         
         return self._execute_wp(cmd)
+    
+    def set_post_categories(self, post_id: int, category_ids: List[int]) -> bool:
+        """
+        Set post categories (replace all existing)
+        
+        Args:
+            post_id: Post ID
+            category_ids: List of category IDs
+            
+        Returns:
+            True if successful
+        """
+        if not category_ids:
+            logger.warning("No category IDs provided")
+            return False
+        
+        # Join category IDs with comma
+        cat_ids_str = ','.join(map(str, category_ids))
+        cmd = f"post update {post_id} --post_category={cat_ids_str}"
+        
+        self._execute_wp(cmd)
+        logger.info(f"Set categories {cat_ids_str} for post {post_id}")
+        
+        return True
+    
+    def add_post_category(self, post_id: int, category_id: int) -> bool:
+        """
+        Add a category to post (append)
+        
+        Args:
+            post_id: Post ID
+            category_id: Category ID to add
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"post term add {post_id} category {category_id}"
+        
+        self._execute_wp(cmd)
+        logger.info(f"Added category {category_id} to post {post_id}")
+        
+        return True
+    
+    def remove_post_category(self, post_id: int, category_id: int) -> bool:
+        """
+        Remove a category from post
+        
+        Args:
+            post_id: Post ID
+            category_id: Category ID to remove
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"post term remove {post_id} category {category_id}"
+        
+        self._execute_wp(cmd)
+        logger.info(f"Removed category {category_id} from post {post_id}")
+        
+        return True
+    
+    def list_categories(self, search: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        List all categories
+        
+        Args:
+            search: Optional search query
+            
+        Returns:
+            List of category dictionaries
+        """
+        cmd = "term list category --format=json --fields=term_id,name,slug,parent,count"
+        
+        if search:
+            escaped_search = search.replace('"', '\\"')
+            cmd += f' --search="{escaped_search}"'
+        
+        result = self._execute_wp(cmd)
+        categories = json.loads(result)
+        
+        logger.debug(f"Found {len(categories)} categories")
+        return categories
+    
+    def get_post_categories(self, post_id: int) -> List[Dict[str, Any]]:
+        """
+        Get categories for a specific post
+        
+        Args:
+            post_id: Post ID
+            
+        Returns:
+            List of category dictionaries
+        """
+        cmd = f"post term list {post_id} category --format=json --fields=term_id,name,slug,parent"
+        
+        result = self._execute_wp(cmd)
+        categories = json.loads(result)
+        
+        logger.debug(f"Post {post_id} has {len(categories)} categories")
+        return categories
+    
+    def get_category_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+        """
+        Get category by name or slug
+        
+        Args:
+            name: Category name or slug
+            
+        Returns:
+            Category dictionary or None
+        """
+        try:
+            # Try to get by slug first
+            cmd = f"term get category '{name}' --format=json --fields=term_id,name,slug,parent"
+            result = self._execute_wp(cmd)
+            category = json.loads(result)
+            
+            logger.debug(f"Found category: {category}")
+            return category
+        except WPCLIError:
+            # If not found by slug, search by name
+            categories = self.list_categories(search=name)
+            
+            # Find exact match (case-insensitive)
+            for cat in categories:
+                if cat['name'].lower() == name.lower() or cat['slug'].lower() == name.lower():
+                    return cat
+            
+            logger.warning(f"Category '{name}' not found")
+            return None
+    
+    def get_category_by_id(self, category_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Get category by ID
+        
+        Args:
+            category_id: Category ID
+            
+        Returns:
+            Category dictionary or None
+        """
+        try:
+            cmd = f"term get category {category_id} --format=json --fields=term_id,name,slug,parent"
+            result = self._execute_wp(cmd)
+            category = json.loads(result)
+            
+            logger.debug(f"Found category: {category}")
+            return category
+        except WPCLIError:
+            logger.warning(f"Category ID {category_id} not found")
+            return None
