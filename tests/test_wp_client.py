@@ -548,6 +548,57 @@ class TestWPClient:
         assert "menu item add-custom 5" in call_args
         assert "--title=" in call_args
     
+    def test_create_term(self, wp_client, mock_ssh):
+        """Test create term"""
+        mock_ssh.execute.return_value = ("15", "")
+        
+        result = wp_client.create_term("category", "New Category", slug="new-cat")
+        
+        assert result == 15
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term create category" in call_args
+        assert "New Category" in call_args
+    
+    def test_delete_term(self, wp_client, mock_ssh):
+        """Test delete term"""
+        mock_ssh.execute.return_value = ("Success: Deleted term", "")
+        
+        result = wp_client.delete_term("category", 15)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term delete category 15" in call_args
+    
+    def test_update_term(self, wp_client, mock_ssh):
+        """Test update term"""
+        mock_ssh.execute.return_value = ("Success: Updated term", "")
+        
+        result = wp_client.update_term("category", 15, name="Updated Category")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "term update category 15" in call_args
+    
+    def test_get_core_version(self, wp_client, mock_ssh):
+        """Test get core version"""
+        mock_ssh.execute.return_value = ("6.4.2", "")
+        
+        result = wp_client.get_core_version()
+        
+        assert result == "6.4.2"
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "core version" in call_args
+    
+    def test_core_is_installed(self, wp_client, mock_ssh):
+        """Test core is installed"""
+        mock_ssh.execute.return_value = ("", "")
+        
+        result = wp_client.core_is_installed()
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "core is-installed" in call_args
+    
     def test_search_replace(self, wp_client, mock_ssh):
         """Test search and replace"""
         mock_ssh.execute.return_value = ("Replaced 5 occurrences", "")

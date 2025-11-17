@@ -777,6 +777,99 @@ class WPClient:
         logger.info(f"Added menu item {item_id} to menu {menu_id}")
         return item_id
     
+    def create_term(self, taxonomy: str, name: str, **kwargs) -> int:
+        """
+        Create a new term
+        
+        Args:
+            taxonomy: Taxonomy name (category, post_tag, etc.)
+            name: Term name
+            **kwargs: Additional options (slug, description, parent, etc.)
+            
+        Returns:
+            Term ID
+        """
+        args = []
+        for key, value in kwargs.items():
+            if isinstance(value, str):
+                escaped_value = value.replace("'", "'\\''")
+                args.append(f"--{key}='{escaped_value}'")
+            else:
+                args.append(f"--{key}={value}")
+        
+        escaped_name = name.replace("'", "'\\''")
+        cmd = f"term create {taxonomy} '{escaped_name}' {' '.join(args)} --porcelain"
+        result = self._execute_wp(cmd)
+        term_id = int(result.strip())
+        logger.info(f"Created term {name} in {taxonomy} with ID {term_id}")
+        return term_id
+    
+    def delete_term(self, taxonomy: str, term_id: int) -> bool:
+        """
+        Delete a term
+        
+        Args:
+            taxonomy: Taxonomy name
+            term_id: Term ID
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"term delete {taxonomy} {term_id}"
+        self._execute_wp(cmd)
+        logger.info(f"Deleted term {term_id} from {taxonomy}")
+        return True
+    
+    def update_term(self, taxonomy: str, term_id: int, **kwargs) -> bool:
+        """
+        Update a term
+        
+        Args:
+            taxonomy: Taxonomy name
+            term_id: Term ID
+            **kwargs: Fields to update (name, slug, description, parent, etc.)
+            
+        Returns:
+            True if successful
+        """
+        args = []
+        for key, value in kwargs.items():
+            if isinstance(value, str):
+                escaped_value = value.replace("'", "'\\''")
+                args.append(f"--{key}='{escaped_value}'")
+            else:
+                args.append(f"--{key}={value}")
+        
+        cmd = f"term update {taxonomy} {term_id} {' '.join(args)}"
+        self._execute_wp(cmd)
+        logger.info(f"Updated term {term_id} in {taxonomy}")
+        return True
+    
+    def get_core_version(self) -> str:
+        """
+        Get WordPress core version
+        
+        Returns:
+            WordPress version string
+        """
+        cmd = "core version"
+        result = self._execute_wp(cmd)
+        return result.strip()
+    
+    def core_is_installed(self) -> bool:
+        """
+        Check if WordPress is installed
+        
+        Returns:
+            True if WordPress is installed
+        """
+        try:
+            cmd = "core is-installed"
+            self._execute_wp(cmd)
+            return True
+        except Exception:
+            return False
+    
     def import_media(self, file_path: str, post_id: int = None, **kwargs) -> int:
         """
         Import media file to WordPress

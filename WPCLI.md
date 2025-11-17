@@ -49,11 +49,11 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp term create** | ❌ | Create new term |
-| **wp term delete** | ❌ | Delete term |
+| **wp term create** | ✅ | Create new term |
+| **wp term delete** | ✅ | Delete term |
 | **wp term list** | ✅ | List terms in taxonomy |
 | **wp term get** | ✅ | Get term details |
-| **wp term update** | ❌ | Update term |
+| **wp term update** | ✅ | Update term |
 | **wp term meta** | ❌ | Manage term meta |
 | **wp term migrate** | ❌ | Migrate term to another taxonomy |
 | **wp term recount** | ❌ | Recount term posts |
@@ -89,11 +89,11 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp core version** | ❌ | Check WP version |
+| **wp core version** | ✅ | Check WP version |
 | **wp core update** | ❌ | Update WordPress |
 | **wp core download** | ❌ | Download WordPress |
 | **wp core install** | ❌ | Install WordPress |
-| **wp core is-installed** | ❌ | Check if WP is installed |
+| **wp core is-installed** | ✅ | Check if WP is installed |
 
 ## Plugin Commands
 
@@ -199,7 +199,7 @@
 - **Post Management**: create, update, list, get, delete, exists
 - **Post Meta**: get, set, update, delete, list
 - **Post Search**: WP_Query 's' parameter (server-side)
-- **Category/Term Management**: set, add, remove, list, search
+- **Category/Term Management**: set, add, remove, list, search, create, delete, update
 - **User Management**: list, get, create, update, delete (with reassign)
 - **User Meta**: get, set, update, delete, list
 - **Option Management**: get, set, delete
@@ -210,6 +210,7 @@
 - **Cache Management**: flush, get type
 - **Transient Management**: get, set, delete
 - **Menu Management**: list, create, delete, add items
+- **Core Commands**: version check, installation check
 - **Database**: queries, search-replace
 - **All WP_Query parameters** via `wp post list`
 
@@ -219,9 +220,10 @@
 - Post url-to-id
 - Plugin install/delete/update
 - Theme install/delete/update
-- Core WordPress management
+- Core WordPress install/update/download
 - Media regenerate thumbnails
 - Comment unapprove/spam/trash
+- Term meta management
 - Cron management
 - Export/import
 
