@@ -93,79 +93,18 @@ def _search_in_post(wp, editor, post_id, pattern):
 
 
 def _search_all_posts(wp, editor, post_type, pattern):
-    """Search across all posts using database query"""
+    """Search across all posts using WP-CLI search"""
     
-    console.print(f"[cyan]Searching {post_type}s in database...[/cyan]\n")
+    console.print(f"[cyan]Searching {post_type}s...[/cyan]\n")
     
-    # Use WP-CLI db query for fast server-side search
-    query = f"""
-        SELECT ID, post_title 
-        FROM wp_posts 
-        WHERE post_type = '{post_type}' 
-        AND post_status = 'publish' 
-        AND post_content LIKE '%{pattern}%'
-        ORDER BY post_date DESC
-    """
-    
-    try:
-        result = wp.db_query(query)
-        
-        # Parse results
-        import json
-        
-        if not result or result.strip() == '' or result == '[]':
-            console.print(f"[yellow]No occurrences found[/yellow]")
-            return
-        
-        posts = json.loads(result) if isinstance(result, str) else result
-        
-        if not posts:
-            console.print(f"[yellow]No occurrences found[/yellow]")
-            return
-        
-        console.print(f"[green]Found in {len(posts)} {post_type}(s):[/green]\n")
-        
-        # Show results with line details for first few posts
-        for i, post in enumerate(posts[:10]):  # Limit to first 10 for performance
-            post_id = post['ID']
-            title = post['post_title']
-            
-            console.print(f"[bold cyan]Post {post_id}:[/bold cyan] {title}")
-            
-            # Get detailed occurrences only for displayed posts
-            try:
-                content = wp.get_post(post_id, field='post_content')
-                occurrences = editor.find_occurrences(content, pattern)
-                
-                for line_num, line_content in occurrences[:3]:  # Show first 3
-                    console.print(f"  Line {line_num}: {line_content[:80]}...")
-                if len(occurrences) > 3:
-                    console.print(f"  [dim]... and {len(occurrences) - 3} more[/dim]")
-            except Exception as e:
-                logger.warning(f"Failed to get details for post {post_id}: {e}")
-            
-            console.print()
-        
-        if len(posts) > 10:
-            console.print(f"[dim]... and {len(posts) - 10} more posts[/dim]")
-    
-    except Exception as e:
-        logger.error(f"Database search failed: {e}")
-        console.print(f"[yellow]Falling back to slower search method...[/yellow]\n")
-        _search_all_posts_fallback(wp, editor, post_type, pattern)
-
-
-def _search_all_posts_fallback(wp, editor, post_type, pattern):
-    """Fallback: Search across all posts (slower method)"""
-    
-    # Get all posts
-    posts = wp.list_posts(post_type=post_type, post_status='publish')
+    # Use 's' parameter (WP_Query search) for server-side search
+    posts = wp.list_posts(post_type=post_type, post_status='publish', s=pattern)
     
     if not posts:
-        console.print(f"[yellow]No {post_type}s found[/yellow]")
+        console.print(f"[yellow]No occurrences found[/yellow]")
         return
     
-    console.print(f"[cyan]Searching {len(posts)} {post_type}s...[/cyan]\n")
+    console.print(f"[green]Found in {len(posts)} {post_type}(s):[/green]\n")
     
     results = []
     
