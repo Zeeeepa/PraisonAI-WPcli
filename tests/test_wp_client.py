@@ -202,6 +202,58 @@ class TestWPClient:
         call_args = mock_ssh.execute.call_args[0][0]
         assert "post meta delete 123 custom_key" in call_args
     
+    def test_list_users(self, wp_client, mock_ssh):
+        """Test list users"""
+        mock_ssh.execute.return_value = ('[{"ID": 1, "user_login": "admin"}]', "")
+        
+        result = wp_client.list_users()
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "user list" in call_args
+    
+    def test_get_user(self, wp_client, mock_ssh):
+        """Test get user"""
+        mock_ssh.execute.return_value = ('{"ID": 1, "user_login": "admin"}', "")
+        
+        result = wp_client.get_user(1)
+        
+        assert isinstance(result, dict)
+        assert result["ID"] == 1
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "user get 1" in call_args
+    
+    def test_get_option(self, wp_client, mock_ssh):
+        """Test get option"""
+        mock_ssh.execute.return_value = ("option_value", "")
+        
+        result = wp_client.get_option("blogname")
+        
+        assert result == "option_value"
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "option get blogname" in call_args
+    
+    def test_set_option(self, wp_client, mock_ssh):
+        """Test set option"""
+        mock_ssh.execute.return_value = ("Success: Updated option", "")
+        
+        result = wp_client.set_option("blogname", "My Blog")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "option set blogname" in call_args
+    
+    def test_delete_option(self, wp_client, mock_ssh):
+        """Test delete option"""
+        mock_ssh.execute.return_value = ("Success: Deleted option", "")
+        
+        result = wp_client.delete_option("custom_option")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "option delete custom_option" in call_args
+    
     def test_search_replace(self, wp_client, mock_ssh):
         """Test search and replace"""
         mock_ssh.execute.return_value = ("Replaced 5 occurrences", "")

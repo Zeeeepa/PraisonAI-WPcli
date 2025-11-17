@@ -120,7 +120,7 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp user list** | ❌ | List users |
+| **wp user list** | ✅ | List users with filters |
 | **wp user create** | ❌ | Create user |
 | **wp user update** | ❌ | Update user |
 | **wp user delete** | ❌ | Delete user |
@@ -130,9 +130,9 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp option get** | ❌ | Get option value |
-| **wp option set** | ❌ | Set option value |
-| **wp option delete** | ❌ | Delete option |
+| **wp option get** | ✅ | Get option value |
+| **wp option set** | ✅ | Set option value |
+| **wp option delete** | ✅ | Delete option |
 | **wp option list** | ❌ | List options |
 
 ## Media Commands
@@ -192,18 +192,22 @@
 ## Summary
 
 ### Currently Supported (✅)
-- Post create, update, list, get
-- Post search with WP_Query parameters
-- Category/term management (set, add, remove, list)
-- Database queries
-- Search and replace
-- All WP_Query parameters via `wp post list`
+- **Post Management**: create, update, list, get, delete, exists
+- **Post Meta**: get, set, update, delete, list
+- **Post Search**: WP_Query 's' parameter (server-side)
+- **Category/Term Management**: set, add, remove, list, search
+- **User Management**: list, get
+- **Option Management**: get, set, delete
+- **Database**: queries, search-replace
+- **All WP_Query parameters** via `wp post list`
 
 ### Not Supported (❌)
-- Post deletion
-- Post meta management
+- Post edit (launch editor)
+- Post generate (dummy posts)
+- Post url-to-id
+- User create/update/delete
+- User meta
 - Plugin/theme management
-- User management
 - Core WordPress management
 - Media management
 - Comment management
@@ -213,8 +217,8 @@
 - Export/import
 
 ### Implementation Priority
-1. Post meta management
-2. Post deletion
-3. User management
-4. Plugin/theme listing
-5. Option management
+1. User create/update/delete
+2. Plugin/theme listing
+3. Media import
+4. Comment management
+5. Menu management

@@ -332,6 +332,88 @@ class WPClient:
         logger.info(f"Updated meta {key} for post {post_id}")
         return True
     
+    def list_users(self, **filters) -> List[Dict[str, Any]]:
+        """
+        List users with filters
+        
+        Args:
+            **filters: Filters (role, search, etc.)
+            
+        Returns:
+            List of user dictionaries
+        """
+        args = ["--format=json"]
+        
+        for key, value in filters.items():
+            args.append(f"--{key}={value}")
+        
+        cmd = f"user list {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
+    
+    def get_user(self, user_id: int) -> Dict[str, Any]:
+        """
+        Get user details
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            User dictionary
+        """
+        cmd = f"user get {user_id} --format=json"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
+    
+    def get_option(self, option_name: str) -> str:
+        """
+        Get WordPress option value
+        
+        Args:
+            option_name: Option name
+            
+        Returns:
+            Option value
+        """
+        cmd = f"option get {option_name}"
+        result = self._execute_wp(cmd)
+        
+        return result.strip()
+    
+    def set_option(self, option_name: str, value: str) -> bool:
+        """
+        Set WordPress option value
+        
+        Args:
+            option_name: Option name
+            value: Option value
+            
+        Returns:
+            True if successful
+        """
+        escaped_value = str(value).replace("'", "'\\''")
+        cmd = f"option set {option_name} '{escaped_value}'"
+        self._execute_wp(cmd)
+        logger.info(f"Set option {option_name}")
+        return True
+    
+    def delete_option(self, option_name: str) -> bool:
+        """
+        Delete WordPress option
+        
+        Args:
+            option_name: Option name
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"option delete {option_name}"
+        self._execute_wp(cmd)
+        logger.info(f"Deleted option {option_name}")
+        return True
+    
     def list_posts(
         self,
         post_type: str = 'post',
