@@ -29,8 +29,8 @@ AI-powered WordPress content management framework with precision editing capabil
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and install
-git clone https://github.com/MervinPraison/praisonaiwp
-cd praisonaiwp
+git clone https://github.com/MervinPraison/PraisonAI-WPcli.git
+cd PraisonAI-WPcli
 uv sync
 
 # Run commands
@@ -43,8 +43,8 @@ uv run praisonaiwp init
 pip install praisonaiwp
 
 # Or install from source
-git clone https://github.com/MervinPraison/praisonaiwp
-cd praisonaiwp
+git clone https://github.com/MervinPraison/PraisonAI-WPcli.git
+cd PraisonAI-WPcli
 pip install -e .
 ```
 
@@ -333,8 +333,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical documentation.
 
 ```bash
 # Clone repository
-git clone https://github.com/MervinPraison/praisonaiwp
-cd praisonaiwp
+git clone https://github.com/MervinPraison/PraisonAI-WPcli.git
+cd PraisonAI-WPcli
 
 # Install in development mode
 pip install -e ".[dev]"
@@ -366,6 +366,6 @@ Praison
 
 ## Links
 
-- GitHub: https://github.com/MervinPraison/PraisonAIWP
+- GitHub: https://github.com/MervinPraison/PraisonAI-WPcli
 - Documentation: https://praisonaiwp.readthedocs.io
 - PyPI: https://pypi.org/project/praisonaiwp
