@@ -1,6 +1,6 @@
-# PraisonAIWP
+# PraisonAI WPcli
 
-AI-powered WordPress content management framework with precision editing capabilities.
+AI-powered WordPress CLI tool for content management with precision editing capabilities.
 
 ## Features
 
