@@ -139,18 +139,21 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp media import** | ❌ | Import media |
+| **wp media import** | ✅ | Import media with metadata |
 | **wp media regenerate** | ❌ | Regenerate thumbnails |
 
 ## Comment Commands
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp comment list** | ❌ | List comments |
-| **wp comment create** | ❌ | Create comment |
-| **wp comment delete** | ❌ | Delete comment |
-| **wp comment approve** | ❌ | Approve comment |
+| **wp comment list** | ✅ | List comments with filters |
+| **wp comment create** | ✅ | Create comment on post |
+| **wp comment update** | ✅ | Update comment fields |
+| **wp comment delete** | ✅ | Delete comment (trash or force) |
+| **wp comment approve** | ✅ | Approve comment |
+| **wp comment unapprove** | ❌ | Unapprove comment |
 | **wp comment spam** | ❌ | Mark as spam |
+| **wp comment trash** | ❌ | Move to trash |
 
 ## Menu Commands
 
@@ -200,6 +203,8 @@
 - **Option Management**: get, set, delete
 - **Plugin Management**: list plugins with filters
 - **Theme Management**: list themes with filters
+- **Media Management**: import with metadata and post attachment
+- **Comment Management**: list, get, create, update, delete, approve
 - **Database**: queries, search-replace
 - **All WP_Query parameters** via `wp post list`
 
@@ -211,8 +216,8 @@
 - Plugin install/activate/deactivate/delete/update
 - Theme install/activate/delete/update
 - Core WordPress management
-- Media management
-- Comment management
+- Media regenerate thumbnails
+- Comment unapprove/spam/trash
 - Menu management
 - Cache/transient management
 - Cron management

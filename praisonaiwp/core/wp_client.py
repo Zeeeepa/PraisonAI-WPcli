@@ -521,6 +521,153 @@ class WPClient:
         
         return json.loads(result)
     
+    def import_media(self, file_path: str, post_id: int = None, **kwargs) -> int:
+        """
+        Import media file to WordPress
+        
+        Args:
+            file_path: Path to media file
+            post_id: Post ID to attach to (optional)
+            **kwargs: Additional options (title, caption, alt, desc, etc.)
+            
+        Returns:
+            Attachment ID
+        """
+        args = [f"'{file_path}'"]
+        
+        if post_id is not None:
+            args.append(f"--post_id={post_id}")
+        
+        for key, value in kwargs.items():
+            escaped_value = str(value).replace("'", "'\\''")
+            args.append(f"--{key}='{escaped_value}'")
+        
+        args.append("--porcelain")
+        
+        cmd = f"media import {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        attachment_id = int(result.strip())
+        logger.info(f"Imported media {file_path} with ID {attachment_id}")
+        return attachment_id
+    
+    def list_comments(self, **filters) -> List[Dict[str, Any]]:
+        """
+        List comments with filters
+        
+        Args:
+            **filters: Filters (status, post_id, etc.)
+            
+        Returns:
+            List of comment dictionaries
+        """
+        args = ["--format=json"]
+        
+        for key, value in filters.items():
+            args.append(f"--{key}={value}")
+        
+        cmd = f"comment list {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
+    
+    def get_comment(self, comment_id: int) -> Dict[str, Any]:
+        """
+        Get comment details
+        
+        Args:
+            comment_id: Comment ID
+            
+        Returns:
+            Comment dictionary
+        """
+        cmd = f"comment get {comment_id} --format=json"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
+    
+    def create_comment(self, post_id: int, **kwargs) -> int:
+        """
+        Create a new comment
+        
+        Args:
+            post_id: Post ID
+            **kwargs: Comment fields (comment_content, comment_author, etc.)
+            
+        Returns:
+            Comment ID
+        """
+        args = [str(post_id)]
+        
+        for key, value in kwargs.items():
+            escaped_value = str(value).replace("'", "'\\''")
+            args.append(f"--{key}='{escaped_value}'")
+        
+        args.append("--porcelain")
+        
+        cmd = f"comment create {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        comment_id = int(result.strip())
+        logger.info(f"Created comment {comment_id} on post {post_id}")
+        return comment_id
+    
+    def update_comment(self, comment_id: int, **kwargs) -> bool:
+        """
+        Update comment fields
+        
+        Args:
+            comment_id: Comment ID
+            **kwargs: Comment fields to update
+            
+        Returns:
+            True if successful
+        """
+        args = [str(comment_id)]
+        
+        for key, value in kwargs.items():
+            escaped_value = str(value).replace("'", "'\\''")
+            args.append(f"--{key}='{escaped_value}'")
+        
+        cmd = f"comment update {' '.join(args)}"
+        self._execute_wp(cmd)
+        logger.info(f"Updated comment {comment_id}")
+        return True
+    
+    def delete_comment(self, comment_id: int, force: bool = False) -> bool:
+        """
+        Delete a comment
+        
+        Args:
+            comment_id: Comment ID
+            force: Bypass trash and force deletion
+            
+        Returns:
+            True if successful
+        """
+        args = [str(comment_id)]
+        
+        if force:
+            args.append("--force")
+        
+        cmd = f"comment delete {' '.join(args)}"
+        self._execute_wp(cmd)
+        logger.info(f"Deleted comment {comment_id}")
+        return True
+    
+    def approve_comment(self, comment_id: int) -> bool:
+        """
+        Approve a comment
+        
+        Args:
+            comment_id: Comment ID
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"comment approve {comment_id}"
+        self._execute_wp(cmd)
+        logger.info(f"Approved comment {comment_id}")
+        return True
+    
     def list_posts(
         self,
         post_type: str = 'post',

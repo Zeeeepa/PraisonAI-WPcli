@@ -310,6 +310,80 @@ class TestWPClient:
         call_args = mock_ssh.execute.call_args[0][0]
         assert "theme list" in call_args
     
+    def test_import_media(self, wp_client, mock_ssh):
+        """Test import media"""
+        mock_ssh.execute.return_value = ("456", "")
+        
+        result = wp_client.import_media("/path/to/image.jpg", post_id=123, title="Test Image")
+        
+        assert result == 456
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "media import" in call_args
+        assert "/path/to/image.jpg" in call_args
+        assert "--post_id=123" in call_args
+    
+    def test_list_comments(self, wp_client, mock_ssh):
+        """Test list comments"""
+        mock_ssh.execute.return_value = ('[{"comment_ID": "1", "comment_content": "Test"}]', "")
+        
+        result = wp_client.list_comments(status="approve")
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment list" in call_args
+    
+    def test_get_comment(self, wp_client, mock_ssh):
+        """Test get comment"""
+        mock_ssh.execute.return_value = ('{"comment_ID": "1"}', "")
+        
+        result = wp_client.get_comment(1)
+        
+        assert isinstance(result, dict)
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment get 1" in call_args
+    
+    def test_create_comment(self, wp_client, mock_ssh):
+        """Test create comment"""
+        mock_ssh.execute.return_value = ("789", "")
+        
+        result = wp_client.create_comment(123, comment_content="Great post!")
+        
+        assert result == 789
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment create 123" in call_args
+    
+    def test_update_comment(self, wp_client, mock_ssh):
+        """Test update comment"""
+        mock_ssh.execute.return_value = ("Success: Updated comment", "")
+        
+        result = wp_client.update_comment(1, comment_content="Updated")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment update 1" in call_args
+    
+    def test_delete_comment(self, wp_client, mock_ssh):
+        """Test delete comment"""
+        mock_ssh.execute.return_value = ("Success: Deleted comment", "")
+        
+        result = wp_client.delete_comment(1, force=True)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment delete 1" in call_args
+        assert "--force" in call_args
+    
+    def test_approve_comment(self, wp_client, mock_ssh):
+        """Test approve comment"""
+        mock_ssh.execute.return_value = ("Success: Approved comment", "")
+        
+        result = wp_client.approve_comment(1)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "comment approve 1" in call_args
+    
     def test_search_replace(self, wp_client, mock_ssh):
         """Test search and replace"""
         mock_ssh.execute.return_value = ("Replaced 5 occurrences", "")
