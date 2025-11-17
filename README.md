@@ -4,18 +4,31 @@ AI-powered WordPress CLI tool for content management with precision editing capa
 
 ## Features
 
+### 🚀 NEW in v1.0.13: Universal WP-CLI Access!
+**ALL 1000+ WP-CLI commands now supported via the generic `wp()` method!**
+
+```python
+from praisonaiwp import SSHManager, WPClient
+
+ssh = SSHManager('example.com', 'username')
+client = WPClient(ssh, '/var/www/html')
+
+# Use ANY WP-CLI command!
+client.wp('cache', 'flush')
+client.wp('db', 'export', 'backup.sql')
+client.wp('plugin', 'install', 'akismet')
+posts = client.wp('post', 'list', status='publish', format='json')
+```
+
+See [GENERIC_WP_METHOD.md](GENERIC_WP_METHOD.md) for complete documentation.
+
 ### Core Features
-- 🚀 **Simple CLI** - Intuitive commands with helpful prompts
+- 🚀 **Universal WP-CLI** - Direct access to ALL WP-CLI commands via `wp()` method
+- 🎯 **Convenience Methods** - 48 wrapper methods with IDE autocomplete for common operations
 - ⚡ **Fast** - Auto-parallel mode for bulk operations (10x faster)
-- 🎯 **Precise** - Line-specific and occurrence-specific text replacements
 - 🔒 **Safe** - Auto-backup, preview mode, dry-run capabilities
 - 🌐 **Multi-Server** - Manage multiple WordPress installations
-- 📝 **Smart** - Auto-detects file formats and optimal settings
-
-### New in v1.0.5 🎉
-- 📂 **Category Management** - Full category support: set, add, remove, list, and search post categories
-- 🔗 **SSH Config Integration** - Use `ssh_host` to reference `~/.ssh/config` hosts directly in config.yaml
-- ✨ **Enhanced Create/Update** - Add `--category` and `--category-id` options to create and update commands
+- 📝 **Smart** - Auto JSON parsing, underscore-to-hyphen conversion
 
 ### Previous Updates (v1.0.2)
 - 🔑 **SSH Config Support** - Use `~/.ssh/config` host aliases for simplified connection management

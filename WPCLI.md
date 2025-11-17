@@ -193,6 +193,27 @@
 | **wp export** | ❌ | Export content |
 | **wp import** | ❌ | Import content |
 
+## 🚀 IMPORTANT: Generic `wp()` Method
+
+**ALL WP-CLI commands are now supported via the generic `wp()` method!**
+
+Even if a command is marked as ❌ below, you can still use it:
+
+```python
+# Any WP-CLI command works!
+client.wp('db', 'export', 'backup.sql')
+client.wp('plugin', 'install', 'akismet')
+client.wp('cron', 'event', 'list', format='json')
+client.wp('media', 'regenerate', '--yes')
+```
+
+See **GENERIC_WP_METHOD.md** for complete documentation.
+
+The table below shows **convenience methods** (with IDE autocomplete and docs).
+For everything else, use the powerful `wp()` method!
+
+---
+
 ## Summary
 
 ### Currently Supported (✅)
@@ -214,18 +235,23 @@
 - **Database**: queries, search-replace
 - **All WP_Query parameters** via `wp post list`
 
-### Not Supported (❌)
-- Post edit (launch editor)
-- Post generate (dummy posts)
-- Post url-to-id
-- Plugin install/delete/update
-- Theme install/delete/update
-- Core WordPress install/update/download
-- Media regenerate thumbnails
-- Comment unapprove/spam/trash
-- Term meta management
-- Cron management
-- Export/import
+### Not Supported as Convenience Methods (❌)
+
+**But ALL are supported via `wp()` method!**
+
+Commands without dedicated convenience methods:
+- Post edit/generate/url-to-id → Use `client.wp('post', 'edit', ...)`
+- Plugin install/delete/update → Use `client.wp('plugin', 'install', ...)`
+- Theme install/delete/update → Use `client.wp('theme', 'install', ...)`
+- Core install/update/download → Use `client.wp('core', 'update', ...)`
+- Media regenerate → Use `client.wp('media', 'regenerate', ...)`
+- Comment spam/trash → Use `client.wp('comment', 'spam', ...)`
+- Term meta → Use `client.wp('term', 'meta', ...)`
+- Cron management → Use `client.wp('cron', 'event', ...)`
+- Export/import → Use `client.wp('export', ...)` or `client.wp('import', ...)`
+- Database operations → Use `client.wp('db', 'export', ...)` etc.
+
+**You're not limited anymore!** Use `wp()` for unlimited WP-CLI access.
 
 ### Implementation Priority
 1. Media import
