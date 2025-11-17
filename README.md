@@ -101,17 +101,30 @@ Just enter the host alias (e.g., `wp-prod`, `wp-staging`, or `wp-dev`) when prom
 - Configure multiple servers in `~/.praisonaiwp/config.yaml`:
   ```yaml
   servers:
+    # Method 1: Using ssh_host (recommended)
     production:
       ssh_host: wp-prod  # Reference SSH config host
       wp_path: /var/www/html
       wp_cli: /usr/local/bin/wp
+    
+    # Method 2: Direct specification (traditional)
     staging:
-      ssh_host: wp-staging  # Reference SSH config host
+      hostname: staging.example.com
+      username: staging_user
+      key_file: ~/.ssh/id_staging
+      port: 22
       wp_path: /var/www/staging
+      wp_cli: /usr/local/bin/wp
+    
+    # Method 3: Mix both (direct values override ssh_host)
+    dev:
+      ssh_host: wp-dev
+      username: custom_user  # Override SSH config username
+      wp_path: /var/www/dev
       wp_cli: /usr/local/bin/wp
   ```
   
-  **New in v1.0.5:** Use `ssh_host` to reference SSH config hosts! Connection details (hostname, username, key_file, port) are automatically loaded from `~/.ssh/config`, so you only need to specify WordPress-specific settings.
+  **New in v1.0.5:** Use `ssh_host` to reference SSH config hosts! Connection details (hostname, username, key_file, port) are automatically loaded from `~/.ssh/config`. You can also specify connection details directly (traditional method) or mix both approaches - direct values always take precedence.
 
 This will prompt you for:
 - **Server hostname** - Can be IP, hostname, or SSH config alias (e.g., `wp-prod`)
