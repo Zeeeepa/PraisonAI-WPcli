@@ -12,7 +12,7 @@
 | **wp post edit** | ❌ | Launch editor for post |
 | **wp post exists** | ✅ | Check if post exists |
 | **wp post generate** | ❌ | Generate dummy posts |
-| **wp post meta** | ❌ | Manage post meta |
+| **wp post meta** | ✅ | Manage post meta (get, set, update, delete, list) |
 | **wp post term** | ✅ | Manage post terms/categories |
 | **wp post url-to-id** | ❌ | Convert URL to post ID |
 

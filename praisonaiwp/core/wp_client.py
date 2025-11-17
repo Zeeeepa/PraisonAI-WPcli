@@ -260,6 +260,78 @@ class WPClient:
             logger.debug(f"Post {post_id} does not exist")
             return False
     
+    def get_post_meta(self, post_id: int, key: str = None) -> Any:
+        """
+        Get post meta value(s)
+        
+        Args:
+            post_id: Post ID
+            key: Meta key (if None, returns all meta)
+            
+        Returns:
+            Meta value or dict of all meta
+        """
+        if key:
+            cmd = f"post meta get {post_id} {key}"
+            result = self._execute_wp(cmd)
+            return result.strip()
+        else:
+            cmd = f"post meta list {post_id} --format=json"
+            result = self._execute_wp(cmd)
+            return json.loads(result)
+    
+    def set_post_meta(self, post_id: int, key: str, value: str) -> bool:
+        """
+        Set post meta value
+        
+        Args:
+            post_id: Post ID
+            key: Meta key
+            value: Meta value
+            
+        Returns:
+            True if successful
+        """
+        escaped_value = str(value).replace("'", "'\\''")
+        cmd = f"post meta set {post_id} {key} '{escaped_value}'"
+        self._execute_wp(cmd)
+        logger.info(f"Set meta {key} for post {post_id}")
+        return True
+    
+    def delete_post_meta(self, post_id: int, key: str) -> bool:
+        """
+        Delete post meta
+        
+        Args:
+            post_id: Post ID
+            key: Meta key
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"post meta delete {post_id} {key}"
+        self._execute_wp(cmd)
+        logger.info(f"Deleted meta {key} from post {post_id}")
+        return True
+    
+    def update_post_meta(self, post_id: int, key: str, value: str) -> bool:
+        """
+        Update post meta value
+        
+        Args:
+            post_id: Post ID
+            key: Meta key
+            value: Meta value
+            
+        Returns:
+            True if successful
+        """
+        escaped_value = str(value).replace("'", "'\\''")
+        cmd = f"post meta update {post_id} {key} '{escaped_value}'"
+        self._execute_wp(cmd)
+        logger.info(f"Updated meta {key} for post {post_id}")
+        return True
+    
     def list_posts(
         self,
         post_type: str = 'post',

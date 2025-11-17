@@ -152,6 +152,56 @@ class TestWPClient:
         
         assert result is False
     
+    def test_get_post_meta(self, wp_client, mock_ssh):
+        """Test get post meta"""
+        mock_ssh.execute.return_value = ("meta_value", "")
+        
+        result = wp_client.get_post_meta(123, "custom_key")
+        
+        assert result == "meta_value"
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post meta get 123 custom_key" in call_args
+    
+    def test_get_post_meta_all(self, wp_client, mock_ssh):
+        """Test get all post meta"""
+        mock_ssh.execute.return_value = ('[{"meta_key": "key1", "meta_value": "value1"}]', "")
+        
+        result = wp_client.get_post_meta(123)
+        
+        assert isinstance(result, list)
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post meta list 123" in call_args
+    
+    def test_set_post_meta(self, wp_client, mock_ssh):
+        """Test set post meta"""
+        mock_ssh.execute.return_value = ("Success: Updated custom field", "")
+        
+        result = wp_client.set_post_meta(123, "custom_key", "custom_value")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post meta set 123 custom_key" in call_args
+    
+    def test_update_post_meta(self, wp_client, mock_ssh):
+        """Test update post meta"""
+        mock_ssh.execute.return_value = ("Success: Updated custom field", "")
+        
+        result = wp_client.update_post_meta(123, "custom_key", "new_value")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post meta update 123 custom_key" in call_args
+    
+    def test_delete_post_meta(self, wp_client, mock_ssh):
+        """Test delete post meta"""
+        mock_ssh.execute.return_value = ("Success: Deleted custom field", "")
+        
+        result = wp_client.delete_post_meta(123, "custom_key")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post meta delete 123 custom_key" in call_args
+    
     def test_search_replace(self, wp_client, mock_ssh):
         """Test search and replace"""
         mock_ssh.execute.return_value = ("Replaced 5 occurrences", "")
