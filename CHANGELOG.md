@@ -5,6 +5,28 @@ All notable changes to PraisonAI WPcli will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2025-11-17
+
+### Added
+- **Cache Management**: flush_cache(), get_cache_type()
+- **Transient Management**: Complete CRUD operations
+  - get_transient() - Get transient value
+  - set_transient() - Set with optional expiration
+  - delete_transient() - Remove transient
+- **Menu Management**: Complete menu operations
+  - list_menus() - List all menus
+  - create_menu() - Create new menu
+  - delete_menu() - Remove menu
+  - add_menu_item() - Add custom menu item
+
+### Changed
+- Updated WPCLI.md with cache, transient, and menu support
+- Enhanced summary with all management features
+
+### Testing
+- Added 9 new unit tests
+- All 59/60 tests passing (98% pass rate)
+
 ## [1.0.10] - 2025-11-17
 
 ### Added
