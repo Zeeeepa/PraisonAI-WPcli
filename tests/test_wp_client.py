@@ -224,6 +224,39 @@ class TestWPClient:
         call_args = mock_ssh.execute.call_args[0][0]
         assert "user get 1" in call_args
     
+    def test_create_user(self, wp_client, mock_ssh):
+        """Test create user"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_user("testuser", "test@example.com", role="editor")
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "user create testuser test@example.com" in call_args
+        assert "--role='editor'" in call_args
+    
+    def test_update_user(self, wp_client, mock_ssh):
+        """Test update user"""
+        mock_ssh.execute.return_value = ("Success: Updated user", "")
+        
+        result = wp_client.update_user(123, display_name="Test User")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "user update 123" in call_args
+        assert "--display_name='Test User'" in call_args
+    
+    def test_delete_user(self, wp_client, mock_ssh):
+        """Test delete user"""
+        mock_ssh.execute.return_value = ("Success: Deleted user", "")
+        
+        result = wp_client.delete_user(123, reassign=1)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "user delete 123" in call_args
+        assert "--reassign=1" in call_args
+    
     def test_get_option(self, wp_client, mock_ssh):
         """Test get option"""
         mock_ssh.execute.return_value = ("option_value", "")
@@ -253,6 +286,29 @@ class TestWPClient:
         assert result is True
         call_args = mock_ssh.execute.call_args[0][0]
         assert "option delete custom_option" in call_args
+    
+    def test_list_plugins(self, wp_client, mock_ssh):
+        """Test list plugins"""
+        mock_ssh.execute.return_value = ('[{"name": "akismet", "status": "active"}]', "")
+        
+        result = wp_client.list_plugins(status="active")
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "plugin list" in call_args
+        assert "--status=active" in call_args
+    
+    def test_list_themes(self, wp_client, mock_ssh):
+        """Test list themes"""
+        mock_ssh.execute.return_value = ('[{"name": "twentytwentyfour", "status": "active"}]', "")
+        
+        result = wp_client.list_themes()
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "theme list" in call_args
     
     def test_search_replace(self, wp_client, mock_ssh):
         """Test search and replace"""

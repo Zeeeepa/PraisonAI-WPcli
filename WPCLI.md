@@ -99,7 +99,7 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp plugin list** | ❌ | List plugins |
+| **wp plugin list** | ✅ | List plugins with filters |
 | **wp plugin install** | ❌ | Install plugin |
 | **wp plugin activate** | ❌ | Activate plugin |
 | **wp plugin deactivate** | ❌ | Deactivate plugin |
@@ -110,7 +110,7 @@
 
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
-| **wp theme list** | ❌ | List themes |
+| **wp theme list** | ✅ | List themes with filters |
 | **wp theme install** | ❌ | Install theme |
 | **wp theme activate** | ❌ | Activate theme |
 | **wp theme delete** | ❌ | Delete theme |
@@ -121,9 +121,9 @@
 | WP-CLI Command | Supported | Feature |
 |---|---|---|
 | **wp user list** | ✅ | List users with filters |
-| **wp user create** | ❌ | Create user |
-| **wp user update** | ❌ | Update user |
-| **wp user delete** | ❌ | Delete user |
+| **wp user create** | ✅ | Create user with role and fields |
+| **wp user update** | ✅ | Update user fields |
+| **wp user delete** | ✅ | Delete user with reassign option |
 | **wp user meta** | ❌ | Manage user meta |
 
 ## Option Commands
@@ -196,8 +196,10 @@
 - **Post Meta**: get, set, update, delete, list
 - **Post Search**: WP_Query 's' parameter (server-side)
 - **Category/Term Management**: set, add, remove, list, search
-- **User Management**: list, get
+- **User Management**: list, get, create, update, delete (with reassign)
 - **Option Management**: get, set, delete
+- **Plugin Management**: list plugins with filters
+- **Theme Management**: list themes with filters
 - **Database**: queries, search-replace
 - **All WP_Query parameters** via `wp post list`
 
@@ -205,9 +207,9 @@
 - Post edit (launch editor)
 - Post generate (dummy posts)
 - Post url-to-id
-- User create/update/delete
 - User meta
-- Plugin/theme management
+- Plugin install/activate/deactivate/delete/update
+- Theme install/activate/delete/update
 - Core WordPress management
 - Media management
 - Comment management
@@ -217,8 +219,8 @@
 - Export/import
 
 ### Implementation Priority
-1. User create/update/delete
-2. Plugin/theme listing
-3. Media import
-4. Comment management
-5. Menu management
+1. Media import
+2. Comment management
+3. Plugin/theme activation
+4. Menu management
+5. User meta

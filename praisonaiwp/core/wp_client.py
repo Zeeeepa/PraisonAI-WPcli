@@ -367,6 +367,73 @@ class WPClient:
         
         return json.loads(result)
     
+    def create_user(self, username: str, email: str, **kwargs) -> int:
+        """
+        Create a new user
+        
+        Args:
+            username: Username
+            email: Email address
+            **kwargs: Additional user fields (role, user_pass, display_name, etc.)
+            
+        Returns:
+            User ID
+        """
+        args = [username, email]
+        
+        for key, value in kwargs.items():
+            escaped_value = str(value).replace("'", "'\\''")
+            args.append(f"--{key}='{escaped_value}'")
+        
+        cmd = f"user create {' '.join(args)} --porcelain"
+        result = self._execute_wp(cmd)
+        user_id = int(result.strip())
+        logger.info(f"Created user {username} with ID {user_id}")
+        return user_id
+    
+    def update_user(self, user_id: int, **kwargs) -> bool:
+        """
+        Update user fields
+        
+        Args:
+            user_id: User ID
+            **kwargs: User fields to update
+            
+        Returns:
+            True if successful
+        """
+        args = [str(user_id)]
+        
+        for key, value in kwargs.items():
+            escaped_value = str(value).replace("'", "'\\''")
+            args.append(f"--{key}='{escaped_value}'")
+        
+        cmd = f"user update {' '.join(args)}"
+        self._execute_wp(cmd)
+        logger.info(f"Updated user {user_id}")
+        return True
+    
+    def delete_user(self, user_id: int, reassign: int = None) -> bool:
+        """
+        Delete a user
+        
+        Args:
+            user_id: User ID to delete
+            reassign: User ID to reassign posts to (optional)
+            
+        Returns:
+            True if successful
+        """
+        args = [str(user_id), "--yes"]
+        
+        if reassign is not None:
+            args.append(f"--reassign={reassign}")
+        
+        cmd = f"user delete {' '.join(args)}"
+        self._execute_wp(cmd)
+        logger.info(f"Deleted user {user_id}")
+        return True
+    
     def get_option(self, option_name: str) -> str:
         """
         Get WordPress option value
@@ -413,6 +480,46 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted option {option_name}")
         return True
+    
+    def list_plugins(self, **filters) -> List[Dict[str, Any]]:
+        """
+        List installed plugins
+        
+        Args:
+            **filters: Filters (status, etc.)
+            
+        Returns:
+            List of plugin dictionaries
+        """
+        args = ["--format=json"]
+        
+        for key, value in filters.items():
+            args.append(f"--{key}={value}")
+        
+        cmd = f"plugin list {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
+    
+    def list_themes(self, **filters) -> List[Dict[str, Any]]:
+        """
+        List installed themes
+        
+        Args:
+            **filters: Filters (status, etc.)
+            
+        Returns:
+            List of theme dictionaries
+        """
+        args = ["--format=json"]
+        
+        for key, value in filters.items():
+            args.append(f"--{key}={value}")
+        
+        cmd = f"theme list {' '.join(args)}"
+        result = self._execute_wp(cmd)
+        
+        return json.loads(result)
     
     def list_posts(
         self,
