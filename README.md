@@ -444,6 +444,218 @@ praisonaiwp create "My Post" --content "Hello" --category "Tech,AI"
 praisonaiwp update 123 --category "Tech,Python"
 ```
 
+## Complete CLI Reference
+
+### `praisonaiwp create` - Create Posts
+
+**All Options:**
+```bash
+praisonaiwp create [TITLE_OR_FILE] [OPTIONS]
+
+Options:
+  --content TEXT       Post content
+  --status TEXT        Post status (publish, draft, private)
+  --type TEXT          Post type (post, page)
+  --category TEXT      Comma-separated category names/slugs
+  --category-id TEXT   Comma-separated category IDs
+  --author TEXT        Post author (user ID or login)
+  --server TEXT        Server name from config
+```
+
+**Examples:**
+```bash
+# Basic post
+praisonaiwp create "My Post" --content "Content here"
+
+# With all options
+praisonaiwp create "My Post" \
+  --content "Full content" \
+  --status publish \
+  --type post \
+  --category "Tech,AI" \
+  --author praison \
+  --server production
+
+# From file
+praisonaiwp create posts.json
+```
+
+---
+
+### `praisonaiwp update` - Update Posts
+
+**All Options:**
+```bash
+praisonaiwp update POST_ID [FIND_TEXT] [REPLACE_TEXT] [OPTIONS]
+
+Options:
+  --line INTEGER        Update specific line number
+  --nth INTEGER         Update nth occurrence
+  --preview             Preview changes without applying
+  --category TEXT       Comma-separated category names/slugs
+  --category-id TEXT    Comma-separated category IDs
+  --post-content TEXT   Replace entire post content
+  --post-title TEXT     Update post title
+  --post-status TEXT    Update post status (publish, draft, private)
+  --server TEXT         Server name from config
+```
+
+**Examples:**
+```bash
+# Find and replace
+praisonaiwp update 123 "old text" "new text"
+
+# Update specific line
+praisonaiwp update 123 "old" "new" --line 10
+
+# Update nth occurrence
+praisonaiwp update 123 "old" "new" --nth 2
+
+# Preview first
+praisonaiwp update 123 "old" "new" --preview
+
+# Update post fields directly
+praisonaiwp update 123 --post-content "New full content"
+praisonaiwp update 123 --post-title "New Title"
+praisonaiwp update 123 --post-status draft
+
+# Update categories
+praisonaiwp update 123 --category "Tech,AI"
+```
+
+---
+
+### `praisonaiwp list` - List Posts
+
+**All Options:**
+```bash
+praisonaiwp list [OPTIONS]
+
+Options:
+  --type TEXT         Post type (post, page, all)
+  --status TEXT       Post status (publish, draft, all)
+  --limit INTEGER     Limit number of results
+  -s, --search TEXT   Search posts by title/content
+  --server TEXT       Server name from config
+```
+
+**Examples:**
+```bash
+# List all posts
+praisonaiwp list
+
+# Search (single word)
+praisonaiwp list --search "Pricing"
+praisonaiwp list -s "keyword"
+
+# Search with spaces (use quotes)
+praisonaiwp list --search "Test Post"
+
+# List pages
+praisonaiwp list --type page
+
+# List drafts
+praisonaiwp list --status draft
+
+# Limit results
+praisonaiwp list --limit 10
+
+# Combine filters
+praisonaiwp list --type post --status publish --limit 20
+```
+
+---
+
+### `praisonaiwp find` - Search Text
+
+**All Options:**
+```bash
+praisonaiwp find PATTERN [POST_ID] [OPTIONS]
+
+Options:
+  --type TEXT    Post type to search
+  --server TEXT  Server name from config
+```
+
+**Examples:**
+```bash
+# Find in specific post
+praisonaiwp find "search text" 123
+
+# Find across all posts
+praisonaiwp find "search text"
+
+# Find in pages
+praisonaiwp find "search text" --type page
+```
+
+---
+
+### `praisonaiwp category` - Manage Categories
+
+**Subcommands:**
+- `list` - List categories (all or for specific post)
+- `search` - Search for categories by name
+- `set` - Set post categories (replace all existing)
+- `add` - Add categories to post (append)
+- `remove` - Remove categories from post
+
+**Examples:**
+```bash
+# List all categories
+praisonaiwp category list
+
+# Search categories
+praisonaiwp category search "Technology"
+
+# List categories for a post
+praisonaiwp category list 123
+
+# Set categories (replace all)
+praisonaiwp category set 123 --category "Tech,AI"
+praisonaiwp category set 123 --category-id "1,2,3"
+
+# Add categories (append)
+praisonaiwp category add 123 --category "Python"
+
+# Remove categories
+praisonaiwp category remove 123 --category "Uncategorized"
+```
+
+---
+
+### Important Notes for AI Agents
+
+**⚠️ Quoting Rules:**
+- Always quote arguments with spaces: `--search "multi word"`
+- Single words don't need quotes: `--search keyword`
+- Category names with commas: `--category "Tech,AI,Python"`
+
+**✅ Correct Usage:**
+```bash
+praisonaiwp list --search "Test Post"
+praisonaiwp create "My Title" --content "My content"
+praisonaiwp update 123 --post-title "New Title"
+```
+
+**❌ Incorrect Usage:**
+```bash
+praisonaiwp list --search Test Post  # ERROR: Too many positional arguments
+praisonaiwp create My Title --content My content  # ERROR: Ambiguous
+```
+
+**🔧 All Available Options Summary:**
+
+| Command | Key Options |
+|---------|-------------|
+| `create` | `--content`, `--status`, `--type`, `--category`, `--category-id`, `--author`, `--server` |
+| `update` | `--line`, `--nth`, `--preview`, `--category`, `--category-id`, `--post-content`, `--post-title`, `--post-status`, `--server` |
+| `list` | `--type`, `--status`, `--limit`, `-s/--search`, `--server` |
+| `find` | `--type`, `--server` |
+| `category` | Subcommands: `list`, `search`, `set`, `add`, `remove` with `--category`, `--category-id` |
+
+---
+
 ## File Formats
 
 ### JSON Format
