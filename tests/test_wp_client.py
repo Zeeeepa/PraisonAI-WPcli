@@ -808,3 +808,146 @@ class TestWPClient:
         call_args = mock_ssh.execute.call_args[0][0]
         assert "post list" in call_args
         assert "--s=" in call_args  # Search parameter is passed
+    
+    # v1.0.15: Test advanced create options
+    def test_create_post_with_excerpt(self, wp_client, mock_ssh):
+        """Test creating post with excerpt"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_post(
+            post_title="Test Post",
+            post_content="Content",
+            post_excerpt="Short summary"
+        )
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post create" in call_args
+        assert "--post_excerpt=" in call_args
+    
+    def test_create_post_with_custom_date(self, wp_client, mock_ssh):
+        """Test creating post with custom date"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_post(
+            post_title="Test Post",
+            post_content="Content",
+            post_date="2024-01-15 10:00:00"
+        )
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post create" in call_args
+        assert "--post_date=" in call_args
+    
+    def test_create_post_with_tags(self, wp_client, mock_ssh):
+        """Test creating post with tags"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_post(
+            post_title="Test Post",
+            post_content="Content",
+            tags_input="python,wordpress"
+        )
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post create" in call_args
+        assert "--tags_input=" in call_args
+    
+    def test_create_post_with_meta(self, wp_client, mock_ssh):
+        """Test creating post with custom meta"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_post(
+            post_title="Test Post",
+            post_content="Content",
+            meta_input='{"custom_field":"value","price":"99.99"}'
+        )
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post create" in call_args
+        assert "--meta_input=" in call_args
+    
+    def test_create_post_with_comment_status(self, wp_client, mock_ssh):
+        """Test creating post with comment status"""
+        mock_ssh.execute.return_value = ("123", "")
+        
+        result = wp_client.create_post(
+            post_title="Test Post",
+            post_content="Content",
+            comment_status="closed"
+        )
+        
+        assert result == 123
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post create" in call_args
+        assert "--comment_status=" in call_args
+    
+    # v1.0.16: Test advanced update options
+    def test_update_post_with_excerpt(self, wp_client, mock_ssh):
+        """Test updating post excerpt"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, post_excerpt="New excerpt")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--post_excerpt=" in call_args
+    
+    def test_update_post_with_author(self, wp_client, mock_ssh):
+        """Test updating post author"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, post_author=2)
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--post_author=" in call_args
+    
+    def test_update_post_with_date(self, wp_client, mock_ssh):
+        """Test updating post date"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, post_date="2024-01-15 10:00:00")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--post_date=" in call_args
+    
+    def test_update_post_with_tags(self, wp_client, mock_ssh):
+        """Test updating post tags"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, tags_input="python,ai")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--tags_input=" in call_args
+    
+    def test_update_post_with_meta(self, wp_client, mock_ssh):
+        """Test updating post meta"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, meta_input='{"views":"1000"}')
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--meta_input=" in call_args
+    
+    def test_update_post_with_comment_status(self, wp_client, mock_ssh):
+        """Test updating comment status"""
+        mock_ssh.execute.return_value = ("Success: Updated post 123", "")
+        
+        result = wp_client.update_post(123, comment_status="closed")
+        
+        assert result is True
+        call_args = mock_ssh.execute.call_args[0][0]
+        assert "post update 123" in call_args
+        assert "--comment_status=" in call_args
