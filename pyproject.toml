@@ -65,6 +65,9 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "integration: Real integration tests without mocks (may be slow)",
+]
 addopts = [
     "--strict-markers",
     "--strict-config",
