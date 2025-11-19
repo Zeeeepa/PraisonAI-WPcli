@@ -9,6 +9,7 @@ from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
+from praisonaiwp.utils.block_converter import convert_to_blocks as html_to_blocks, has_blocks
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
@@ -63,9 +64,10 @@ def _parse_category_input(category_str, category_id_str, wp):
 @click.option('--tags', help='Comma-separated tag names or IDs')
 @click.option('--meta', help='Post meta in JSON format: {"key":"value"}')
 @click.option('--comment-status', help='Comment status (open, closed)')
+@click.option('--convert-to-blocks', is_flag=True, help='Auto-convert HTML to Gutenberg blocks')
 @click.option('--server', default=None, help='Server name from config')
 def create_command(title_or_file, content, status, post_type, category, category_id, author, 
-                   excerpt, date, tags, meta, comment_status, server):
+                   excerpt, date, tags, meta, comment_status, convert_to_blocks, server):
     """
     Create WordPress posts
     
@@ -118,6 +120,7 @@ def create_command(title_or_file, content, status, post_type, category, category
                 tags,
                 meta,
                 comment_status,
+                convert_to_blocks,
                 server_config
             )
     
@@ -128,7 +131,7 @@ def create_command(title_or_file, content, status, post_type, category, category
 
 
 def _create_single_post(title, content, status, post_type, category, category_id, author,
-                        excerpt, date, tags, meta, comment_status, server_config):
+                        excerpt, date, tags, meta, comment_status, convert_to_blocks_flag, server_config):
     """Create a single post"""
     
     if not content:
@@ -140,7 +143,7 @@ def _create_single_post(title, content, status, post_type, category, category_id
     with SSHManager(
         server_config['hostname'],
         server_config['username'],
-        server_config['key_file'],
+        server_config.get('key_filename'),
         server_config.get('port', 22)
     ) as ssh:
         
@@ -151,12 +154,18 @@ def _create_single_post(title, content, status, post_type, category, category_id
             server_config.get('wp_cli', '/usr/local/bin/wp')
         )
         
-        # Build post arguments
+        # Convert HTML to blocks if requested
+        if convert_to_blocks_flag and content and not has_blocks(content):
+            console.print("[cyan]Converting HTML to Gutenberg blocks...[/cyan]")
+            content = html_to_blocks(content)
+            console.print("[green]✓ Content converted to blocks[/green]")
+        
+        # Prepare post arguments
         post_args = {
             'post_title': title,
             'post_content': content,
             'post_status': status,
-            'post_type': post_type
+            'post_type': post_type,
         }
         
         # Add author if specified

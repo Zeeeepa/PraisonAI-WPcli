@@ -7,6 +7,7 @@ from praisonaiwp.utils.exceptions import (
     WPCLIError,
     ConfigNotFoundError,
 )
+from praisonaiwp.utils.block_converter import convert_to_blocks, has_blocks
 
 __all__ = [
     "get_logger",
@@ -14,4 +15,6 @@ __all__ = [
     "SSHConnectionError",
     "WPCLIError",
     "ConfigNotFoundError",
+    "convert_to_blocks",
+    "has_blocks",
 ]
