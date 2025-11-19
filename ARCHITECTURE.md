@@ -134,6 +134,101 @@ class SSHManager:
 - Handles different PHP binaries (Plesk support)
 - Returns Python objects (not raw strings)
 
+**API Design Philosophy: Dual-Layer Approach**
+
+The WP Client provides two complementary APIs:
+
+#### **High-Level API: Convenience Methods (✅)**
+**Purpose:** Common operations with excellent developer experience
+
+**Benefits:**
+- ✅ **IDE Autocomplete** - IntelliSense shows available parameters
+- ✅ **Type Hints** - Static type checking catches errors early
+- ✅ **Inline Documentation** - Docstrings explain usage and parameters
+- ✅ **Input Validation** - Python-side validation before SSH execution
+- ✅ **Return Type Handling** - Automatic parsing and type conversion
+- ✅ **Error Messages** - Clear, actionable error messages
+
+**Coverage:** ~47 convenience methods covering 80% of use cases
+- Post management (create, update, list, get, delete, exists, meta)
+- User management (CRUD + meta operations)
+- Term/category management (full CRUD)
+- Plugin/theme management (list, activate, deactivate)
+- Comment management (CRUD + approve)
+- Menu management (CRUD + add items)
+- Cache/transient management
+- Database operations (query, search-replace)
+- Core commands (version, is-installed)
+
+**Example:**
+```python
+# Clean, type-safe, documented
+post_id = client.create_post(
+    post_title='My Post',
+    post_content='Content here',
+    post_status='publish',
+    post_author=1
+)  # Returns: int (post ID)
+```
+
+#### **Low-Level API: Generic `wp()` Method (❌)**
+**Purpose:** Universal access to ALL WP-CLI commands
+
+**Benefits:**
+- ✅ **Universal** - Supports ALL 1000+ WP-CLI commands
+- ✅ **Future-Proof** - New WP-CLI features work automatically
+- ✅ **Flexible** - Custom WP-CLI packages supported
+- ✅ **No Maintenance** - No code updates needed for new commands
+- ✅ **Auto JSON Parsing** - Automatically parses `format=json` output
+- ✅ **Kwargs Support** - Python kwargs → WP-CLI flags
+
+**Coverage:** Unlimited - any WP-CLI command works
+
+**Example:**
+```python
+# Direct WP-CLI access - works for anything
+client.wp('db', 'export', 'backup.sql')
+client.wp('plugin', 'install', 'akismet', activate=True)
+client.wp('cron', 'event', 'run', 'my_custom_hook')
+client.wp('media', 'regenerate', yes=True)
+
+# Auto JSON parsing
+posts = client.wp('post', 'list', format='json')  # Returns: List[Dict]
+```
+
+#### **Why Not Implement Everything as Convenience Methods?**
+
+**Maintenance Burden:**
+- Would require 100+ additional methods
+- Each needs: implementation, tests, documentation, maintenance
+- WP-CLI updates would require code changes
+- Code bloat: ~3000+ lines vs current ~1300 lines
+
+**Diminishing Returns:**
+- 80% of operations already have convenience methods
+- Remaining 20% are rarely used or simple enough
+- Generic `wp()` handles the long tail perfectly
+
+**When to Add New Convenience Methods:**
+
+Only add if the operation is:
+1. **Frequently used** by most users (>10% usage)
+2. **Complex syntax** that benefits from Python wrapper
+3. **Needs validation** or special handling
+4. **Explicitly requested** by multiple users
+
+**Historical Context:**
+- **v1.0.0-1.0.12**: Only convenience methods existed (limited functionality)
+- **v1.0.13**: Generic `wp()` method added as "escape hatch"
+- **v1.0.13+**: Best of both worlds - convenience + flexibility
+- **v1.0.17**: Added HTML to Gutenberg blocks converter
+
+**Think of It Like:**
+- **Convenience Methods** = jQuery (high-level, common tasks, great DX)
+- **Generic `wp()` Method** = Vanilla JS (low-level, full power, unlimited)
+
+Both approaches have their place and complement each other perfectly!
+
 **NEW - Installation Verification:**
 - Automatic verification on initialization (`verify_installation=True`)
 - Checks performed:

@@ -214,6 +214,86 @@ For everything else, use the powerful `wp()` method!
 
 ---
 
+## Design Philosophy: Why Two Approaches?
+
+### Convenience Methods (✅) vs Generic `wp()` Method (❌)
+
+We provide **both** approaches for different use cases:
+
+#### **Convenience Methods (✅)** - High-Level API
+**When:** Frequently used operations (80% of use cases)
+
+**Benefits:**
+- ✅ **IDE Autocomplete** - See available parameters
+- ✅ **Type Hints** - Catch errors before runtime
+- ✅ **Inline Documentation** - Docstrings explain usage
+- ✅ **Validation** - Python-side parameter validation
+- ✅ **Return Type Handling** - Automatic parsing/conversion
+- ✅ **Better Developer Experience** - Clean, intuitive API
+
+**Example:**
+```python
+# Clean, type-safe, documented
+post_id = client.create_post(
+    post_title='My Post',
+    post_content='Content here',
+    post_status='publish'
+)  # Returns: int (post ID)
+```
+
+#### **Generic `wp()` Method (❌)** - Low-Level API
+**When:** Rarely used, simple, or future operations
+
+**Benefits:**
+- ✅ **Universal** - ALL 1000+ WP-CLI commands
+- ✅ **Future-Proof** - Supports new WP-CLI features automatically
+- ✅ **Flexible** - Custom WP-CLI packages work out of the box
+- ✅ **No Maintenance** - No code updates needed for new commands
+- ✅ **Simple Operations** - One-liners don't need wrappers
+
+**Example:**
+```python
+# Direct WP-CLI access - works for anything
+client.wp('db', 'export', 'backup.sql')
+client.wp('plugin', 'install', 'akismet', activate=True)
+client.wp('cron', 'event', 'run', 'my_custom_hook')
+```
+
+### Why Not Implement Everything as Convenience Methods?
+
+**Maintenance Burden:**
+- ❌ Would require 100+ additional methods
+- ❌ Each needs: implementation, tests, docs, maintenance
+- ❌ WP-CLI updates would require code changes
+- ❌ Code bloat: ~3000+ lines vs current ~1300 lines
+
+**Diminishing Returns:**
+- ✅ 80% of operations already have convenience methods
+- ✅ Remaining 20% are rarely used or simple enough
+- ✅ Generic `wp()` handles the long tail perfectly
+
+### When to Add New Convenience Methods?
+
+Only add if the operation is:
+1. **Frequently used** by most users
+2. **Complex syntax** that benefits from Python wrapper
+3. **Needs validation** or special handling
+4. **Explicitly requested** by users
+
+### Historical Context
+
+- **v1.0.0-1.0.12**: Only convenience methods existed
+- **v1.0.13**: Generic `wp()` method added as "escape hatch"
+- **v1.0.13+**: Best of both worlds - convenience + flexibility
+
+### Think of It Like:
+- **Convenience Methods** = jQuery (high-level, common tasks)
+- **Generic `wp()` Method** = Vanilla JS (low-level, full power)
+
+Both have their place!
+
+---
+
 ## Summary
 
 ### Currently Supported (✅)
