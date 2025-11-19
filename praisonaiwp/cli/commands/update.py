@@ -4,7 +4,7 @@ import click
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
-from praisonaiwp.core.content_editor import ContentEditor
+from praisonaiwp.editors.content_editor import ContentEditor
 from praisonaiwp.utils.logger import get_logger
 from praisonaiwp.utils.block_converter import convert_to_blocks as html_to_blocks, has_blocks
 from rich.console import Console

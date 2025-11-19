@@ -5,7 +5,19 @@ All notable changes to PraisonAI WPcli will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.17] - 2025-11-19
+## [1.0.18] - 2025-11-19
+
+### Fixed
+- **Critical Import Error**: Fixed `ModuleNotFoundError` in v1.0.17
+  - Corrected import path in `update.py`: `praisonaiwp.core.content_editor` → `praisonaiwp.editors.content_editor`
+  - v1.0.17 was broken and unusable
+  - v1.0.18 restores full functionality
+
+### Note
+- All v1.0.17 features (HTML to Gutenberg blocks converter) are working correctly in v1.0.18
+- If you installed v1.0.17, please upgrade to v1.0.18 immediately
+
+## [1.0.17] - 2025-11-19 [BROKEN - DO NOT USE]
 
 ### Added
 - **HTML to Gutenberg Blocks Converter**: Automatic conversion of HTML to WordPress blocks
