@@ -94,11 +94,19 @@ class PraisonAIWPIntegration:
             dict: Post ID and content
         """
         import json
+        from praisonaiwp.utils.markdown_converter import auto_convert_content
+
+        # Ensure SSH connection is established
+        if not self.wp_client.ssh.client:
+            self.wp_client.ssh.connect()
+
+        # Auto-convert Markdown to Gutenberg blocks if needed
+        content = auto_convert_content(task_output.raw, to_blocks=True)
 
         # Prepare post data
         post_data = {
             'post_title': self.current_title,
-            'post_content': task_output.raw,
+            'post_content': content,
             'post_status': self.config.get('status', 'draft')
         }
 
@@ -154,7 +162,7 @@ class PraisonAIWPIntegration:
 
         return {
             'post_id': post_id,
-            'content': task_output.raw
+            'content': content
         }
 
     def create_wordpress_tools(self):

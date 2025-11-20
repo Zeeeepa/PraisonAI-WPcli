@@ -248,6 +248,30 @@ class WPClient:
             result = self._execute_wp(cmd)
             return json.loads(result)
     
+    def get_default_user(self) -> Optional[str]:
+        """
+        Get the default admin user (user with ID 1 or first admin user)
+        
+        Returns:
+            User login name or None if not found
+        """
+        try:
+            # Try to get user with ID 1 (typically the first admin)
+            cmd = "user get 1 --field=user_login"
+            result = self._execute_wp(cmd)
+            return result.strip()
+        except Exception:
+            try:
+                # Fallback: get first admin user
+                cmd = "user list --role=administrator --field=user_login --format=csv"
+                result = self._execute_wp(cmd)
+                users = result.strip().split('\n')
+                if users and users[0]:
+                    return users[0]
+            except Exception as e:
+                logger.warning(f"Could not get default user: {e}")
+        return None
+
     def create_post(self, **kwargs) -> int:
         """
         Create a new post
@@ -258,6 +282,13 @@ class WPClient:
         Returns:
             Created post ID
         """
+        # Auto-set author to default admin if not specified
+        if 'post_author' not in kwargs:
+            default_user = self.get_default_user()
+            if default_user:
+                kwargs['post_author'] = default_user
+                logger.debug(f"Using default author: {default_user}")
+        
         args = []
         for key, value in kwargs.items():
             # Escape single quotes in value
