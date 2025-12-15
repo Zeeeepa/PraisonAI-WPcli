@@ -53,7 +53,7 @@ def _parse_category_input(category_str, category_id_str, wp):
 
 @click.command()
 @click.argument('title_or_file', required=False)
-@click.option('--content', help='Post content')
+@click.option('--content', help='Post content (HTML format, auto-converts to Gutenberg blocks)')
 @click.option('--status', default='publish', help='Post status (publish, draft, private)')
 @click.option('--type', 'post_type', default='post', help='Post type (post, page)')
 @click.option('--category', help='Comma-separated category names/slugs')
@@ -76,17 +76,20 @@ def create_command(title_or_file, content, status, post_type, category, category
         # Interactive mode
         praisonaiwp create
         
-        # Single post
-        praisonaiwp create "My Post" --content "Hello World"
+        # Single post with HTML content (recommended)
+        praisonaiwp create "My Post" --content "<h2>Title</h2><p>Content here</p>"
         
         # With categories
-        praisonaiwp create "My Post" --content "Hello" --category "RAG,AI"
+        praisonaiwp create "My Post" --content "<p>Hello</p>" --category "RAG,AI"
         
         # From file (auto-detects format)
         praisonaiwp create posts.json
         
         # Create page
-        praisonaiwp create "About Us" --content "..." --type page
+        praisonaiwp create "About Us" --content "<p>About content</p>" --type page
+    
+    Note: Content should be HTML. It auto-converts to Gutenberg blocks.
+    Use --no-block-conversion to disable this.
     """
     
     try:
