@@ -34,6 +34,9 @@ def run(transport, host, port, server):
         praisonaiwp mcp run -t streamable-http # Run with HTTP transport
         praisonaiwp mcp run --server production # Use specific WordPress server
     """
+    import sys
+    import shutil
+
     try:
         from praisonaiwp.mcp.server import run_server, MCP_AVAILABLE
 
@@ -46,11 +49,81 @@ def run(transport, host, port, server):
         if server:
             os.environ['PRAISONAIWP_SERVER'] = server
 
-        console.print(f"[green]Starting MCP server...[/green]")
-        console.print(f"Transport: [cyan]{transport}[/cyan]")
+        # Find executable path for config
+        praisonaiwp_path = shutil.which('praisonaiwp')
+        if not praisonaiwp_path:
+            praisonaiwp_path = sys.executable
+
+        console.print("\n[bold green]═══ PraisonAIWP MCP Server ═══[/bold green]\n")
+
+        # Show available tools summary
+        console.print("[bold]Available:[/bold] 23 Tools | 8 Resources | 4 Prompts")
+        console.print(f"[bold]Transport:[/bold] [cyan]{transport}[/cyan]")
 
         if transport == 'streamable-http':
-            console.print(f"URL: [cyan]http://{host}:{port}/mcp[/cyan]")
+            console.print(f"[bold]URL:[/bold] [cyan]http://{host}:{port}/mcp[/cyan]")
+
+        console.print("\n[bold yellow]═══ MCP Client Configurations ═══[/bold yellow]\n")
+
+        # Claude Desktop
+        console.print("[bold]Claude Desktop[/bold] (macOS: ~/Library/Application Support/Claude/claude_desktop_config.json)")
+        console.print("[bold]Claude Desktop[/bold] (Windows: %APPDATA%/Claude/claude_desktop_config.json)")
+        console.print("[bold]Claude Desktop[/bold] (Linux: ~/.config/claude/claude_desktop_config.json)")
+        claude_config = {
+            "mcpServers": {
+                "praisonaiwp": {
+                    "command": praisonaiwp_path,
+                    "args": ["mcp", "run"] if shutil.which('praisonaiwp') else ["-m", "praisonaiwp", "mcp", "run"]
+                }
+            }
+        }
+        console.print(f"[dim]{json.dumps(claude_config, indent=2)}[/dim]\n")
+
+        # Cursor
+        console.print("[bold]Cursor[/bold] (.cursor/mcp.json in project root)")
+        cursor_config = {
+            "mcpServers": {
+                "praisonaiwp": {
+                    "command": praisonaiwp_path,
+                    "args": ["mcp", "run"] if shutil.which('praisonaiwp') else ["-m", "praisonaiwp", "mcp", "run"]
+                }
+            }
+        }
+        console.print(f"[dim]{json.dumps(cursor_config, indent=2)}[/dim]\n")
+
+        # VS Code
+        console.print("[bold]VS Code[/bold] (.vscode/mcp.json in project root)")
+        console.print(f"[dim]{json.dumps(cursor_config, indent=2)}[/dim]\n")
+
+        # Windsurf
+        console.print("[bold]Windsurf[/bold] (~/.codeium/windsurf/mcp_config.json)")
+        console.print(f"[dim]{json.dumps(cursor_config, indent=2)}[/dim]\n")
+
+        console.print("[bold yellow]═══ Available Tools ═══[/bold yellow]")
+        tools = [
+            "create_post", "update_post", "delete_post", "get_post", "list_posts", "find_text",
+            "list_categories", "set_post_categories", "create_term",
+            "list_users", "create_user", "get_user",
+            "list_plugins", "activate_plugin", "deactivate_plugin",
+            "list_themes", "activate_theme", "import_media",
+            "flush_cache", "get_core_version", "db_query", "search_replace", "wp_cli"
+        ]
+        console.print(f"[dim]{', '.join(tools)}[/dim]\n")
+
+        console.print("[bold yellow]═══ Available Resources ═══[/bold yellow]")
+        resources = [
+            "wordpress://info", "wordpress://posts/{post_id}", "wordpress://posts",
+            "wordpress://categories", "wordpress://users", "wordpress://plugins",
+            "wordpress://themes", "wordpress://config"
+        ]
+        console.print(f"[dim]{', '.join(resources)}[/dim]\n")
+
+        console.print("[bold yellow]═══ Available Prompts ═══[/bold yellow]")
+        prompts = ["create_blog_post_prompt", "update_content_prompt", "bulk_update_prompt", "seo_optimize_prompt"]
+        console.print(f"[dim]{', '.join(prompts)}[/dim]\n")
+
+        console.print("[bold green]═══ Server Starting ═══[/bold green]")
+        console.print("[dim]Press Ctrl+C to stop[/dim]\n")
 
         run_server(transport=transport)
 

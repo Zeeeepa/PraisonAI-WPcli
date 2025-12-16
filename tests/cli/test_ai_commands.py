@@ -2,10 +2,19 @@
 import pytest
 from click.testing import CliRunner
 from unittest.mock import Mock, patch
+import os
+
+# Check if AI features are available
+try:
+    from praisonaiwp.ai.integration import PraisonAIWPIntegration
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
 
 from praisonaiwp.cli.commands.ai_commands import ai
 
 
+@pytest.mark.skipif(not AI_AVAILABLE, reason="AI features not installed")
 class TestAICommands:
     """Test AI CLI commands"""
 
@@ -31,7 +40,7 @@ class TestAICommands:
     @patch('praisonaiwp.cli.commands.ai_commands.AI_AVAILABLE', True)
     @patch('praisonaiwp.cli.commands.ai_commands.Config')
     @patch('praisonaiwp.cli.commands.ai_commands.SSHManager')
-    @patch('praisonaiwp.cli.commands.ai_commands.PraisonAIWPIntegration')
+    @patch('praisonaiwp.ai.integration.PraisonAIWPIntegration')
     def test_ai_generate_basic(
         self,
         mock_integration_class,
@@ -69,7 +78,7 @@ class TestAICommands:
     @patch('praisonaiwp.cli.commands.ai_commands.AI_AVAILABLE', True)
     @patch('praisonaiwp.cli.commands.ai_commands.load_config')
     @patch('praisonaiwp.cli.commands.ai_commands.WPClient')
-    @patch('praisonaiwp.cli.commands.ai_commands.PraisonAIWPIntegration')
+    @patch('praisonaiwp.ai.integration.PraisonAIWPIntegration')
     def test_ai_generate_with_title(
         self,
         mock_integration_class,
@@ -107,7 +116,7 @@ class TestAICommands:
     @patch('praisonaiwp.cli.commands.ai_commands.AI_AVAILABLE', True)
     @patch('praisonaiwp.cli.commands.ai_commands.load_config')
     @patch('praisonaiwp.cli.commands.ai_commands.WPClient')
-    @patch('praisonaiwp.cli.commands.ai_commands.PraisonAIWPIntegration')
+    @patch('praisonaiwp.ai.integration.PraisonAIWPIntegration')
     def test_ai_generate_with_auto_publish(
         self,
         mock_integration_class,
@@ -146,7 +155,7 @@ class TestAICommands:
     @patch('praisonaiwp.cli.commands.ai_commands.AI_AVAILABLE', True)
     @patch('praisonaiwp.cli.commands.ai_commands.load_config')
     @patch('praisonaiwp.cli.commands.ai_commands.WPClient')
-    @patch('praisonaiwp.cli.commands.ai_commands.PraisonAIWPIntegration')
+    @patch('praisonaiwp.ai.integration.PraisonAIWPIntegration')
     def test_ai_generate_with_status(
         self,
         mock_integration_class,
@@ -204,7 +213,7 @@ class TestAICommands:
     @patch('praisonaiwp.cli.commands.ai_commands.AI_AVAILABLE', True)
     @patch('praisonaiwp.cli.commands.ai_commands.load_config')
     @patch('praisonaiwp.cli.commands.ai_commands.WPClient')
-    @patch('praisonaiwp.cli.commands.ai_commands.PraisonAIWPIntegration')
+    @patch('praisonaiwp.ai.integration.PraisonAIWPIntegration')
     def test_ai_generate_with_verbose(
         self,
         mock_integration_class,

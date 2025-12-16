@@ -3,9 +3,16 @@ import os
 import pytest
 from unittest.mock import Mock, patch
 
-from praisonaiwp.ai.integration import PraisonAIWPIntegration
+# Check if AI features are available
+try:
+    from praisonaiwp.ai.integration import PraisonAIWPIntegration
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+    PraisonAIWPIntegration = None
 
 
+@pytest.mark.skipif(not AI_AVAILABLE, reason="AI features not installed")
 class TestEnhancedIntegration:
     """Test enhanced integration features"""
 

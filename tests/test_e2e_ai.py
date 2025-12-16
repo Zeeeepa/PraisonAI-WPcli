@@ -4,9 +4,17 @@ import pytest
 from click.testing import CliRunner
 from unittest.mock import Mock, patch, MagicMock
 
+# Check if AI features are available
+try:
+    from praisonaiwp.ai.integration import PraisonAIWPIntegration
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+
 from praisonaiwp.cli.main import cli
 
 
+@pytest.mark.skipif(not AI_AVAILABLE, reason="AI features not installed")
 class TestE2EAI:
     """End-to-end AI integration tests"""
 

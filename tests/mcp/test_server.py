@@ -66,14 +66,14 @@ class TestMCPServerTools:
     
     def test_server_has_create_post_tool(self):
         """Test server has create_post tool"""
-        from praisonaiwp.mcp import server
-        # Verify the tool function exists
-        assert hasattr(server, 'create_post') or 'create_post' in dir(server)
+        from praisonaiwp.mcp import tools
+        # Verify the tool function exists in tools module
+        assert hasattr(tools, 'create_post')
     
     def test_server_has_list_posts_tool(self):
         """Test server has list_posts tool"""
-        from praisonaiwp.mcp import server
-        assert hasattr(server, 'list_posts') or 'list_posts' in dir(server)
+        from praisonaiwp.mcp import tools
+        assert hasattr(tools, 'list_posts')
 
 
 class TestMCPServerResources:
