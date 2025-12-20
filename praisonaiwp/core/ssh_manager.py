@@ -147,7 +147,9 @@ class SSHManager:
             stderr_str = stderr.read().decode('utf-8')
             
             if stderr_str and 'Error:' in stderr_str:
-                logger.warning(f"Command stderr: {stderr_str}")
+                # Don't warn about "Term doesn't exist" - it's expected when looking up categories by name
+                if "Term doesn't exist" not in stderr_str:
+                    logger.warning(f"Command stderr: {stderr_str}")
             
             logger.debug(f"Command completed with {len(stdout_str)} bytes output")
             

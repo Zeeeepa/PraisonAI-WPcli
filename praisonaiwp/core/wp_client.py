@@ -221,7 +221,9 @@ class WPClient:
                 )
             
             if 'error:' in error_lower:
-                logger.error(f"WP-CLI error: {stderr}")
+                # Don't log "Term doesn't exist" as error - it's expected when looking up categories by name
+                if "term doesn't exist" not in error_lower:
+                    logger.error(f"WP-CLI error: {stderr}")
                 raise WPCLIError(f"WP-CLI error: {stderr}")
         
         return stdout.strip()
