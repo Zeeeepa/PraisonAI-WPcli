@@ -5,6 +5,54 @@ All notable changes to PraisonAI WPcli will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-12-21
+
+### 🎉 Major Release: Configuration v2.0 with Auto-Routing
+
+### Added
+- **Configuration v2.0 Schema**: Enhanced server configuration with website identification
+  - `website` field: Primary website URL for each server (e.g., `https://biblerevelation.org`)
+  - `aliases` field: Alternative domains for the same server
+  - `description` field: Human-readable server description
+  - `tags` field: Searchable tags for AI-based server matching
+  - `author` and `category` fields: Default post metadata per server
+  - `auto_route` setting: Enable/disable automatic server selection
+
+- **ServerRouter Class**: Intelligent server routing based on context
+  - `find_server_by_website()`: Route by explicit website URL or domain
+  - `find_server_by_keywords()`: Auto-detect server from content text
+  - `get_server_info()`: Get human-readable server information
+  - Case-insensitive matching with www. normalization
+  - Support for domain aliases
+
+- **Configuration Migration**: Automatic v1.0 to v2.0 migration
+  - `migrate_config_v1_to_v2()`: Upgrades old configs automatically
+  - `extract_website_from_wp_path()`: Extracts domain from WordPress paths
+  - `needs_migration()`: Checks if migration is needed
+  - Backward compatible with v1.0 configs
+
+- **Test Coverage**: 24 new tests for v2.0 features
+  - 11 tests for config schema and migration
+  - 13 tests for ServerRouter functionality
+  - 100% test pass rate
+
+### Enhanced
+- **AI-Friendly Configuration**: Clear website mapping for intelligent routing
+- **User Experience**: Servers now self-documenting with website URLs
+- **Safety**: Auto-route defaults to False, requires explicit enablement
+
+### Benefits
+- **For Users**: Immediately see which website each server manages
+- **For AI Assistants**: Can auto-detect correct server from content context
+- **For Developers**: Extensible routing strategies with isolated, testable logic
+
+### Migration Guide
+Existing v1.0 configs continue to work. To upgrade to v2.0:
+1. Add `website` field to each server configuration
+2. Optionally add `aliases`, `description`, and `tags`
+3. Set `auto_route: true` in settings to enable auto-routing
+4. Update `version: '2.0'`
+
 ## [1.1.6] - 2025-12-14
 
 ### Added

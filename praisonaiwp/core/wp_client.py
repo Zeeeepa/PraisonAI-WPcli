@@ -656,6 +656,21 @@ class WPClient:
         logger.info(f"Deactivated plugin {plugin}")
         return True
     
+    def update_plugin(self, plugin: str = "all") -> bool:
+        """
+        Update one or all plugins
+        
+        Args:
+            plugin: Plugin slug/path or "all" to update all plugins
+            
+        Returns:
+            True if successful
+        """
+        cmd = f"plugin update {plugin}"
+        self._execute_wp(cmd)
+        logger.info(f"Updated plugin(s): {plugin}")
+        return True
+    
     def activate_theme(self, theme: str) -> bool:
         """
         Activate a theme
