@@ -84,7 +84,7 @@ def set_categories(post_id, category, category_id, server):
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
-            server_config['key_file'],
+            server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
             wp = WPClient(
@@ -144,7 +144,7 @@ def add_categories(post_id, category, category_id, server):
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
-            server_config['key_file'],
+            server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
             wp = WPClient(
@@ -202,7 +202,7 @@ def remove_categories(post_id, category, category_id, server):
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
-            server_config['key_file'],
+            server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
             wp = WPClient(
@@ -257,7 +257,7 @@ def list_categories(post_id, search, server):
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
-            server_config['key_file'],
+            server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
             wp = WPClient(
@@ -342,7 +342,7 @@ def search_categories(query, server):
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
-            server_config['key_file'],
+            server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
             wp = WPClient(
@@ -382,4 +382,158 @@ def search_categories(query, server):
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Category search failed: {e}")
+        raise click.Abort()
+
+
+@category_command.command(name='create')
+@click.argument('name')
+@click.option('--slug', help='Category slug')
+@click.option('--description', help='Category description')
+@click.option('--parent', type=int, help='Parent category ID')
+@click.option('--server', default=None, help='Server name from config')
+def create_category(name, slug, description, parent, server):
+    """
+    Create a new category
+    
+    Examples:
+    
+        # Create basic category
+        praisonaiwp category create "Technology"
+        
+        # Create category with slug and description
+        praisonaiwp category create "AI" --slug "artificial-intelligence" --description "AI related posts"
+        
+        # Create child category
+        praisonaiwp category create "Machine Learning" --parent 123
+    """
+    try:
+        config = Config()
+        server_config = config.get_server(server)
+        
+        with SSHManager(
+            server_config['hostname'],
+            server_config['username'],
+            server_config.get('key_filename'),
+            server_config.get('port', 22)
+        ) as ssh:
+            
+            wp = WPClient(
+                ssh,
+                server_config['wp_path'],
+                server_config.get('php_bin', 'php'),
+                server_config.get('wp_cli', '/usr/local/bin/wp')
+            )
+            
+            category_id = wp.create_category(
+                name=name,
+                slug=slug,
+                description=description,
+                parent=parent
+            )
+            
+            console.print(f"[green]✓ Created category '{name}' with ID {category_id}[/green]")
+                
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        logger.error(f"Create category failed: {e}")
+        raise click.Abort()
+
+
+@category_command.command(name='update')
+@click.argument('category_id', type=int)
+@click.option('--name', help='New category name')
+@click.option('--slug', help='New category slug')
+@click.option('--description', help='New category description')
+@click.option('--parent', type=int, help='New parent category ID')
+@click.option('--server', default=None, help='Server name from config')
+def update_category(category_id, name, slug, description, parent, server):
+    """
+    Update an existing category
+    
+    Examples:
+    
+        # Update category name
+        praisonaiwp category update 123 --name "New Name"
+        
+        # Update multiple fields
+        praisonaiwp category update 123 --name "AI" --slug "artificial-intelligence" --description "Updated description"
+    """
+    try:
+        config = Config()
+        server_config = config.get_server(server)
+        
+        with SSHManager(
+            server_config['hostname'],
+            server_config['username'],
+            server_config.get('key_filename'),
+            server_config.get('port', 22)
+        ) as ssh:
+            
+            wp = WPClient(
+                ssh,
+                server_config['wp_path'],
+                server_config.get('php_bin', 'php'),
+                server_config.get('wp_cli', '/usr/local/bin/wp')
+            )
+            
+            success = wp.update_category(
+                category_id=category_id,
+                name=name,
+                slug=slug,
+                description=description,
+                parent=parent
+            )
+            
+            if success:
+                console.print(f"[green]✓ Updated category {category_id}[/green]")
+            else:
+                console.print(f"[red]Failed to update category {category_id}[/red]")
+                
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        logger.error(f"Update category failed: {e}")
+        raise click.Abort()
+
+
+@category_command.command(name='delete')
+@click.argument('category_id', type=int)
+@click.option('--server', default=None, help='Server name from config')
+@click.confirmation_option(prompt='Are you sure you want to delete this category?')
+def delete_category(category_id, server):
+    """
+    Delete a category
+    
+    Examples:
+    
+        # Delete category
+        praisonaiwp category delete 123
+    """
+    try:
+        config = Config()
+        server_config = config.get_server(server)
+        
+        with SSHManager(
+            server_config['hostname'],
+            server_config['username'],
+            server_config.get('key_filename'),
+            server_config.get('port', 22)
+        ) as ssh:
+            
+            wp = WPClient(
+                ssh,
+                server_config['wp_path'],
+                server_config.get('php_bin', 'php'),
+                server_config.get('wp_cli', '/usr/local/bin/wp')
+            )
+            
+            success = wp.delete_category(category_id)
+            
+            if success:
+                console.print(f"[green]✓ Deleted category {category_id}[/green]")
+            else:
+                console.print(f"[red]Failed to delete category {category_id}[/red]")
+                
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        logger.error(f"Delete category failed: {e}")
         raise click.Abort()
