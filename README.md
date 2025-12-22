@@ -2263,20 +2263,651 @@ praisonaiwp --json cron run my_hook
 praisonaiwp --json cron event schedule my_hook --hook_code "my_function()" --recurrence "hourly"
 ```
 
-### Complete AI Command List
-| Command | AI Example |
-|---------|-----------|
-| `create` | `praisonaiwp --json create "Title" --content "<p>Content</p>"` |
-| `list` | `praisonaiwp --json list --type post` |
-| `update` | `praisonaiwp --json update 123 --post-content "<p>New</p>"` |
-| `config` | `praisonaiwp --json config get DB_NAME` |
-| `role` | `praisonaiwp --json role list` |
-| `scaffold` | `praisonaiwp --json scaffold post-type book` |
-| `core` | `praisonaiwp --json core version` |
-| `cron` | `praisonaiwp --json cron list` |
-| `taxonomy` | `praisonaiwp --json taxonomy list` |
-| `term` | `praisonaiwp --json term list category` |
-| `widget` | `praisonaiwp --json widget list` |
+## 📋 Complete CLI Command Reference
+
+### 🤖 AI Commands (v1.6.0)
+
+#### `praisonaiwp ai` - AI-Powered Content Management
+**Main AI command group with 13 subcommands:**
+
+```bash
+# Generate AI content
+praisonaiwp ai generate "Topic" [OPTIONS]
+Options:
+  --content TEXT      Custom content prompt
+  --word-count INTEGER Target word count
+  --tone TEXT         Content tone (professional, casual, academic)
+  --seo-optimize      Enable SEO optimization
+  --auto-publish      Auto-publish generated content
+  --server TEXT       Server name from config
+  --author TEXT       Author name
+  --category TEXT     Category name
+  --tags TEXT         Comma-separated tags
+  --status TEXT       Post status (publish, draft)
+  --json              Output in JSON format
+
+# Content summarization
+praisonaiwp ai summarize [OPTIONS]
+Subcommands:
+  post                Summarize existing post
+  content             Summarize custom content
+Options:
+  --post-id INTEGER   Post ID to summarize
+  --content TEXT      Custom content to summarize
+  --length TEXT       Summary length (short, medium, long)
+  --format TEXT       Output format (paragraph, bullets)
+  --excerpt           Generate excerpt
+  --social TEXT       Generate social posts (twitter,linkedin,facebook)
+  --json              Output in JSON format
+
+# Content optimization
+praisonaiwp ai optimize [OPTIONS]
+Subcommands:
+  post                Optimize existing post
+  content             Optimize custom content
+Options:
+  --post-id INTEGER   Post ID to optimize
+  --content TEXT      Custom content to optimize
+  --seo               Enable SEO optimization
+  --readability       Improve readability
+  --engagement        Optimize for engagement
+  --apply             Apply optimizations directly
+  --json              Output in JSON format
+
+# Content translation
+praisonaiwp ai translate [OPTIONS]
+Subcommands:
+  post                Translate existing post
+  content             Translate custom content
+Options:
+  --post-id INTEGER   Post ID to translate
+  --content TEXT      Custom content to translate
+  --to TEXT           Target languages (comma-separated)
+  --from TEXT         Source language (auto-detect if not specified)
+  --preserve-formatting Preserve HTML formatting
+  --create-new        Create new posts for translations
+  --json              Output in JSON format
+
+# Content scheduling
+praisonaiwp ai schedule [OPTIONS]
+Subcommands:
+  analyze             Analyze scheduling patterns
+  suggest             Suggest optimal times
+  calendar            Generate content calendar
+Options:
+  --days INTEGER      Analysis period in days
+  --category TEXT     Filter by category
+  --timezone TEXT     Timezone for scheduling
+  --frequency TEXT    Posting frequency (daily, weekly, monthly)
+  --json              Output in JSON format
+
+# Comment moderation
+praisonaiwp ai moderate [OPTIONS]
+Subcommands:
+  comments            Moderate comments
+  analyze             Analyze comment patterns
+  respond             Generate responses
+Options:
+  --post-id INTEGER   Moderate comments for specific post
+  --auto-approve      Auto-approve safe comments
+  --spam-detection    Enable spam detection
+  --sentiment-analysis Analyze sentiment
+  --generate-responses Generate AI responses
+  --json              Output in JSON format
+
+# Content curation
+praisonaiwp ai curate [OPTIONS]
+Subcommands:
+  related             Find related content
+  suggest             Suggest content ideas
+  trending            Get trending topics
+Options:
+  --post-id INTEGER   Find content related to post
+  --category TEXT     Filter by category
+  --count INTEGER     Number of suggestions
+  --trending          Get trending topics
+  --json              Output in JSON format
+
+# Research assistant
+praisonaiwp ai research [OPTIONS]
+Subcommands:
+  topic               Research a topic
+  citations           Generate citations
+  outline             Create content outline
+Options:
+  --topic TEXT        Research topic
+  --depth TEXT        Research depth (basic, comprehensive, detailed)
+  --sources INTEGER   Number of sources to include
+  --format TEXT       Output format (markdown, html, plain)
+  --citations         Include citations
+  --json              Output in JSON format
+
+# Image generation
+praisonaiwp ai image [OPTIONS]
+Subcommands:
+  generate            Generate images
+  optimize            Optimize existing images
+  alt-text            Generate alt text
+Options:
+  --prompt TEXT       Image generation prompt
+  --style TEXT        Image style (photorealistic, artistic, cartoon)
+  --size TEXT         Image size (small, medium, large)
+  --media-id INTEGER  Optimize existing media
+  --alt-text          Generate alt text for images
+  --json              Output in JSON format
+
+# Chatbot integration
+praisonaiwp ai chatbot [OPTIONS]
+Subcommands:
+  deploy              Deploy chatbot
+  train               Train chatbot
+  analytics           Get chatbot analytics
+Options:
+  --widget-style TEXT Widget style (modern, classic, minimal)
+  --position TEXT     Widget position (bottom-right, bottom-left)
+  --color TEXT        Widget color
+  --content-type TEXT Training content type
+  --model TEXT        AI model to use
+  --days INTEGER      Analytics period
+  --json              Output in JSON format
+
+# Performance analysis
+praisonaiwp ai analyze [OPTIONS]
+Subcommands:
+  performance         Analyze content performance
+  predict             Predict performance
+  compare             Compare performance
+Options:
+  --post-id INTEGER   Analyze specific post
+  --metrics TEXT      Metrics to analyze (views, engagement, seo)
+  --timeframe TEXT    Analysis timeframe
+  --days INTEGER      Comparison period
+  --json              Output in JSON format
+
+# SEO audit
+praisonaiwp ai seo [OPTIONS]
+Subcommands:
+  audit               Perform SEO audit
+  keywords            Analyze keywords
+  meta                Analyze meta tags
+Options:
+  --post-id INTEGER   Audit specific post
+  --depth TEXT        Audit depth (basic, comprehensive)
+  --focus-keyword TEXT Focus keyword for analysis
+  --competitors       Analyze competitors
+  --json              Output in JSON format
+
+# Workflow automation
+praisonaiwp ai workflow [OPTIONS]
+Subcommands:
+  create              Create workflow
+  list                List workflows
+  run                 Run workflow
+Options:
+  --name TEXT         Workflow name
+  --description TEXT  Workflow description
+  --trigger TEXT      Workflow trigger (schedule, manual, event)
+  --workflow-id TEXT  Workflow ID
+  --json              Output in JSON format
+
+# Bulk operations
+praisonaiwp ai bulk [OPTIONS]
+Subcommands:
+  process             Process bulk operations
+  optimize            Bulk optimize
+  translate           Bulk translate
+Options:
+  --posts TEXT        Post IDs or range (1,2,3 or 1-10)
+  --category TEXT     Process by category
+  --status TEXT       Filter by status
+  --limit INTEGER     Limit number of posts
+  --operation TEXT    Operation type (optimize, translate, summarize)
+  --params TEXT       Operation parameters (JSON)
+  --json              Output in JSON format
+```
+
+### 📝 Core Content Commands
+
+#### `praisonaiwp create` - Create Posts
+```bash
+praisonaiwp create TITLE [OPTIONS]
+
+Options:
+  --content TEXT      Post content (HTML or plain text)
+  --status TEXT       Post status (publish, draft, private)
+  --author TEXT       Author username
+  --category TEXT     Category name or ID
+  --tags TEXT         Comma-separated tag names
+  --excerpt TEXT      Post excerpt
+  --date TEXT         Publication date (YYYY-MM-DD HH:MM:SS)
+  --meta TEXT         Custom meta data (JSON format)
+  --comment-status TEXT Comment status (open, closed)
+  --server TEXT       Server name from config
+  --no-block-conversion Send raw Gutenberg blocks
+  --json              Output in JSON format
+
+Examples:
+praisonaiwp create "My Post" --content "<p>Content here</p>"
+praisonaiwp create "Draft Post" --content "Content" --status draft
+praisonaiwp create "Tech Post" --content "Content" --category "Technology" --tags "tech,ai"
+```
+
+#### `praisonaiwp update` - Update Posts
+```bash
+praisonaiwp update POST_ID [OPTIONS]
+
+Options:
+  OLD_TEXT            Text to find and replace
+  NEW_TEXT            Replacement text
+  --line INTEGER      Specific line to update
+  --nth INTEGER       Update nth occurrence
+  --preview           Preview changes before applying
+  --post-content TEXT Replace entire content
+  --post-title TEXT   Update title
+  --post-status TEXT  Update status
+  --post-excerpt TEXT Update excerpt
+  --tags TEXT         Update tags (comma-separated)
+  --post-author TEXT  Update author
+  --post-date TEXT    Update date
+  --meta TEXT         Update custom meta (JSON)
+  --comment-status TEXT Update comment status
+  --category TEXT     Update categories
+  --convert-to-blocks Convert HTML to Gutenberg blocks
+  --json              Output in JSON format
+
+Examples:
+praisonaiwp update 123 "old text" "new text"
+praisonaiwp update 123 --post-title "New Title"
+praisonaiwp update 123 --post-content "<h2>New Content</h2>"
+```
+
+#### `praisonaiwp list` - List Posts
+```bash
+praisonaiwp list [OPTIONS]
+
+Options:
+  --type TEXT         Post type (post, page, all)
+  --status TEXT       Post status (publish, draft, all)
+  --limit INTEGER     Limit number of results
+  -s, --search TEXT   Search posts by title/content
+  --server TEXT       Server name from config
+  --json              Output in JSON format
+
+Examples:
+praisonaiwp list
+praisonaiwp list --type page --status draft
+praisonaiwp list --search "keyword" --limit 10
+```
+
+#### `praisonaiwp find` - Search Text
+```bash
+praisonaiwp find PATTERN [POST_ID] [OPTIONS]
+
+Options:
+  --case-sensitive    Case-sensitive search
+  --whole-word        Match whole words only
+  --context INTEGER   Show context lines
+  --server TEXT       Server name from config
+  --json              Output in JSON format
+
+Examples:
+praisonaiwp find "search term"
+praisonaiwp find "term" 123 --context 3
+```
+
+### 👥 User Management
+
+#### `praisonaiwp user` - Manage Users
+```bash
+# Subcommands:
+list                 List all users
+get <id>            Get user details
+create              Create new user
+update <id>         Update user
+delete <id>         Delete user
+
+# Create user options:
+--email TEXT         User email
+--username TEXT      Username
+--password TEXT      Password
+--role TEXT          User role
+--first-name TEXT    First name
+--last-name TEXT     Last name
+
+# Examples:
+praisonaiwp user create --email "user@example.com" --username "newuser" --role "author"
+praisonaiwp user list
+praisonaiwp user get 123
+```
+
+### 📁 Media Management
+
+#### `praisonaiwp media` - Manage Media
+```bash
+# Subcommands:
+upload <file>        Upload media file
+url <url>            Upload media from URL
+get <id>            Get media details
+list                List media files
+
+# Upload options:
+--title TEXT         Media title
+--caption TEXT       Media caption
+--alt TEXT           Alt text
+--description TEXT  Media description
+
+# Examples:
+praisonaiwp media upload image.jpg --title "My Image" --alt "Description"
+praisonaiwp media list
+praisonaiwp media get 123
+```
+
+### 🏷️ Category Management
+
+#### `praisonaiwp category` - Manage Categories
+```bash
+# Subcommands:
+list                List categories
+get <id>            Get category details
+set <post-id> <cat-id> Set post category
+add <post-id> <cat-id> Add category to post
+remove <post-id> <cat-id> Remove category from post
+create              Create new category
+delete <id>         Delete category
+
+# Create options:
+--name TEXT         Category name
+--slug TEXT         Category slug
+--description TEXT  Category description
+--parent INTEGER    Parent category ID
+
+# Examples:
+praisonaiwp category list
+praisonaiwp category create --name "Technology" --description "Tech posts"
+praisonaiwp category set 123 5
+```
+
+### 🔌 Plugin Management
+
+#### `praisonaiwp plugin` - Manage Plugins
+```bash
+# Subcommands:
+list                List plugins
+activate <plugin>   Activate plugin
+deactivate <plugin> Deactivate plugin
+update <plugin>     Update plugin
+delete <plugin>     Delete plugin
+
+# Examples:
+praisonaiwp plugin list
+praisonaiwp plugin activate hello-dolly
+praisonaiwp plugin update akismet
+```
+
+### ⚙️ Configuration Management
+
+#### `praisonaiwp config` - Manage WordPress Config
+```bash
+# Subcommands:
+get <key>           Get config value
+set <key> <value>   Set config value
+list                List all config
+
+# Examples:
+praisonaiwp config get DB_NAME
+praisonaiwp config set SITE_URL "https://example.com"
+praisonaiwp config list
+```
+
+### 🎭 Role Management
+
+#### `praisonaiwp role` - Manage User Roles
+```bash
+# Subcommands:
+list                List roles
+get <role>          Get role details
+create              Create new role
+delete <role>       Delete role
+
+# Create options:
+--name TEXT         Role name
+--display-name TEXT Display name
+
+# Examples:
+praisonaiwp role list
+praisonaiwp role get administrator
+```
+
+### 🛠️ Scaffold Commands
+
+#### `praisonaiwp scaffold` - Generate WordPress Code
+```bash
+# Subcommands:
+post-type <name>    Generate post type
+taxonomy <name>     Generate taxonomy
+plugin <name>       Generate plugin
+theme <name>        Generate theme
+child-theme <parent> <name> Generate child theme
+
+# Examples:
+praisonaiwp scaffold post-type book
+praisonaiwp scaffold plugin my-plugin
+praisonaiwp scaffold child-theme twentytwentyfour my-child
+```
+
+### 🔧 WordPress Core Management
+
+#### `praisonaiwp core` - Manage WordPress Core
+```bash
+# Subcommands:
+version             Get WordPress version
+check-update        Check for updates
+update [version]    Update WordPress
+install <version>   Install specific version
+config              Generate wp-config.php
+
+# Examples:
+praisonaiwp core version
+praisonaiwp core update
+praisonaiwp core check-update
+```
+
+### ⏰ Cron Management
+
+#### `praisonaiwp cron` - Manage WordPress Cron
+```bash
+# Subcommands:
+list                List scheduled events
+run <hook>          Run cron event
+test                Test cron system
+event               Manage cron events
+
+# Event subcommands:
+schedule <hook>     Schedule event
+delete <hook>       Delete event
+
+# Examples:
+praisonaiwp cron list
+praisonaiwp cron run my_hook
+praisonaiwp cron event schedule my_hook --recurrence hourly
+```
+
+### 🏷️ Taxonomy Management
+
+#### `praisonaiwp taxonomy` - Manage Taxonomies
+```bash
+# Subcommands:
+list                List taxonomies
+get <taxonomy>      Get taxonomy details
+
+# Examples:
+praisonaiwp taxonomy list
+praisonaiwp taxonomy get category
+```
+
+### 📄 Term Management
+
+#### `praisonaiwp term` - Manage Taxonomy Terms
+```bash
+# Subcommands:
+list <taxonomy>     List terms in taxonomy
+get <taxonomy> <id> Get term details
+create <taxonomy>   Create new term
+update <taxonomy> <id> Update term
+delete <taxonomy> <id> Delete term
+
+# Examples:
+praisonaiwp term list category
+praisonaiwp term create category --name "New Category"
+```
+
+### 🎨 Widget Management
+
+#### `praisonaiwp widget` - Manage Widgets
+```bash
+# Subcommands:
+list                List widgets
+add <widget>        Add widget
+update <id>         Update widget
+delete <id>         Delete widget
+
+# Examples:
+praisonaiwp widget list
+praisonaiwp widget add text --title "My Widget"
+```
+
+### 🗂️ Post Utilities
+
+#### `praisonaiwp post` - Post Utilities
+```bash
+# Subcommands:
+meta <post-id>      Manage post meta
+thumbnail <post-id> Manage post thumbnail
+revisions <post-id> List post revisions
+
+# Meta subcommands:
+get <key>           Get meta value
+set <key> <value>   Set meta value
+delete <key>        Delete meta value
+
+# Examples:
+praisonaiwp post meta 123 get views
+praisonaiwp post meta 123 set views 1000
+praisonaiwp post revisions 123
+```
+
+### 💾 Database Operations
+
+#### `praisonaiwp db` - Database Operations
+```bash
+# Subcommands:
+export              Export database
+import <file>       Import database
+optimize            Optimize database
+repair              Repair database
+size                Get database size
+
+# Examples:
+praisonaiwp db export
+praisonaiwp db import backup.sql
+praisonaiwp db optimize
+```
+
+### 🔍 Help and Information
+
+#### `praisonaiwp help` - Get Help
+```bash
+praisonaiwp help [COMMAND]
+
+Examples:
+praisonaiwp help
+praisonaiwp help create
+praisonaiwp help ai
+```
+
+#### `praisonaiwp eval` - Execute PHP Code
+```bash
+praisonaiwp eval "PHP_CODE"
+praisonaiwp eval --file <file>
+
+Examples:
+praisonaiwp eval "echo 'Hello World';"
+praisonaiwp eval --file script.php
+```
+
+### 🛠️ Maintenance Mode
+
+#### `praisonaiwp maintenance-mode` - Maintenance Mode
+```bash
+# Subcommands:
+status              Check status
+activate            Activate maintenance mode
+deactivate          Deactivate maintenance mode
+
+# Examples:
+praisonaiwp maintenance-mode status
+praisonaiwp maintenance-mode activate
+praisonaiwp maintenance-mode deactivate
+```
+
+### 📤 Import/Export
+
+#### `praisonaiwp import` - Import Data
+```bash
+praisonaiwp import <file> [OPTIONS]
+
+Options:
+  --type TEXT        Import type (posts, pages, users)
+  --author-map TEXT  Author mapping (JSON)
+
+Examples:
+praisonaiwp import posts.xml --type posts
+```
+
+#### `praisonaiwp export` - Export Data
+```bash
+praisonaiwp export [OPTIONS]
+
+Options:
+  --type TEXT        Export type (posts, pages, users)
+  --format TEXT      Export format (xml, json, csv)
+  --file TEXT        Output file
+
+Examples:
+praisonaiwp export --type posts --format xml
+praisonaiwp export --type users --file users.json
+```
+
+## 🌐 Global Options
+
+All commands support these global options:
+```bash
+--json              Output in JSON format
+--version, -v       Show version and exit
+--help, -h          Show help message
+```
+
+## 🔧 Configuration
+
+### Server Configuration
+```yaml
+# ~/.praisonaiwp/config.yaml
+servers:
+  mysite:
+    host: example.com
+    user: username
+    key_file: ~/.ssh/id_rsa
+    wp_path: /var/www/html
+    author: praison
+    category: AI
+    tags: ai,automation
+```
+
+### Environment Variables
+```bash
+export PRAISONAIWP_CONFIG_PATH=~/.praisonaiwp/config.yaml
+export OPENAI_API_KEY=your_openai_key
+```
 
 ### Error Handling for AI
 | Error Code | Description | AI Response |
