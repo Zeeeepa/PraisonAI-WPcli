@@ -1,8 +1,8 @@
 # PraisonAI WPcli - Feature Roadmap
 
-## Current Status (v1.6.0)
+## Current Status (v1.7.0)
 
-**WPClient Method Coverage: 28/61 (45.9%)**
+**WPClient Method Coverage: 43/61 (70.5%)**
 
 ### ✅ Implemented Features
 
@@ -42,7 +42,22 @@
    - **AI Workflow Builder** - Create and manage automated content workflows
    - **AI Bulk Operations** - Perform bulk AI operations on multiple posts
 
-9. **MCP Support** (23 tools)
+9. **Complete WP-CLI Command Coverage** (15 new commands)
+   - **ability** - Manage user capabilities and permissions
+   - **admin** - WordPress admin management (URL, paths, settings)
+   - **block** - WordPress block management and registration
+   - **cap** - Role capability management
+   - **cli** - WP-CLI management and utilities
+   - **dist-archive** - Create distribution archives
+   - **embed** - WordPress embed management and providers
+   - **eval-file** - Execute PHP files in WordPress context
+   - **i18n** - Internationalization (POT/PO/MO file management)
+   - **language** - Language pack management
+   - **package** - WP-CLI package management
+   - **profile** - WordPress performance profiling
+   - **shell** - Interactive WordPress shell
+
+10. **MCP Support** (23 tools)
    - Model Context Protocol integration
 
 ---

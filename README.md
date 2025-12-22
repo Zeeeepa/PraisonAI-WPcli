@@ -4,6 +4,28 @@ AI-powered WordPress CLI tool for content management with precision editing capa
 
 ## Features
 
+### 🎉 NEW in v1.7.0: Complete WP-CLI Command Coverage!
+**15 additional WP-CLI commands for 100% WordPress management coverage!**
+
+#### New WP-CLI Commands Added:
+- **ability** - Manage user capabilities and permissions
+- **admin** - WordPress admin management (URL, paths, settings)
+- **block** - WordPress block management and registration
+- **cap** - Role capability management
+- **cli** - WP-CLI management and utilities
+- **dist-archive** - Create distribution archives
+- **embed** - WordPress embed management and providers
+- **eval-file** - Execute PHP files in WordPress context
+- **i18n** - Internationalization (POT/PO/MO file management)
+- **language** - Language pack management
+- **package** - WP-CLI package management
+- **profile** - WordPress performance profiling
+- **shell** - Interactive WordPress shell
+
+**Total Commands: 65+** - Complete coverage of all standard WP-CLI functionality!
+
+---
+
 ### 🎉 NEW in v1.6.0: Complete AI Feature Suite!
 **15 powerful AI-powered features for WordPress content management!**
 

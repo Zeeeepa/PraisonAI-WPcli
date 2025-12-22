@@ -5,6 +5,40 @@ All notable changes to PraisonAI WPcli will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-12-22
+
+### 🔧 Complete WP-CLI Command Coverage
+
+#### Added
+- **15 New WP-CLI Commands** - Complete coverage of all standard WP-CLI commands
+- **ability** - Manage user capabilities and permissions
+- **admin** - WordPress admin management (URL, paths, settings)
+- **block** - WordPress block management and registration
+- **cap** - Role capability management
+- **cli** - WP-CLI management and utilities
+- **dist-archive** - Create distribution archives
+- **embed** - WordPress embed management and providers
+- **eval-file** - Execute PHP files in WordPress context
+- **i18n** - Internationalization (POT/PO/MO file management)
+- **language** - Language pack management
+- **package** - WP-CLI package management
+- **profile** - WordPress performance profiling
+- **shell** - Interactive WordPress shell
+
+#### Enhanced
+- **Complete CLI Command Reference** - Added comprehensive documentation for all 65+ commands
+- **Jekyll Documentation Site** - Fixed dependency issues and improved local development
+- **Command Organization** - Better structure and categorization of commands
+- **Error Handling** - Improved error messages and debugging information
+
+#### Technical
+- **Version Upgrade** - Upgraded to v1.7.0 for new command features
+- **Import System** - Added all new command imports to main CLI
+- **Documentation** - Complete command reference with examples and options
+- **Dependencies** - Fixed Jekyll protobuf compatibility issues
+
+---
+
 ## [1.6.0] - 2025-12-22
 
 ### 🤖 Complete AI Feature Suite

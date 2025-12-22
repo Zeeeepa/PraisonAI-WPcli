@@ -46,6 +46,21 @@ from praisonaiwp.cli.commands.update import update_command
 from praisonaiwp.cli.commands.user import user_command
 from praisonaiwp.cli.commands.widget import widget_command
 
+# New WP-CLI commands
+from praisonaiwp.cli.commands.ability import ability
+from praisonaiwp.cli.commands.admin import admin
+from praisonaiwp.cli.commands.block import block
+from praisonaiwp.cli.commands.cap import cap
+from praisonaiwp.cli.commands.cli import wpcli
+from praisonaiwp.cli.commands.dist_archive import dist_archive
+from praisonaiwp.cli.commands.embed import embed
+from praisonaiwp.cli.commands.eval_file import eval_file
+from praisonaiwp.cli.commands.i18n import i18n
+from praisonaiwp.cli.commands.language import language
+from praisonaiwp.cli.commands.package import package
+from praisonaiwp.cli.commands.profile import profile
+from praisonaiwp.cli.commands.shell import shell
+
 # Try to import AI commands (optional)
 try:
     from praisonaiwp.cli.commands.ai_commands import ai
@@ -248,6 +263,21 @@ cli.add_command(eval_command, name='eval')
 cli.add_command(maintenance_mode, name='maintenance-mode')
 cli.add_command(export_command, name='export')
 cli.add_command(import_command, name='import')
+
+# Register new WP-CLI commands
+cli.add_command(ability, name='ability')
+cli.add_command(admin, name='admin')
+cli.add_command(block, name='block')
+cli.add_command(cap, name='cap')
+cli.add_command(wpcli, name='cli')
+cli.add_command(dist_archive, name='dist-archive')
+cli.add_command(embed, name='embed')
+cli.add_command(eval_file, name='eval-file')
+cli.add_command(i18n, name='i18n')
+cli.add_command(language, name='language')
+cli.add_command(package, name='package')
+cli.add_command(profile, name='profile')
+cli.add_command(shell, name='shell')
 
 # Register AI commands if available
 if AI_COMMANDS_AVAILABLE:
