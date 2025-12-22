@@ -216,3 +216,28 @@ class SSHManager:
     def __del__(self):
         """Cleanup on deletion"""
         self.close()
+
+    @staticmethod
+    def from_config(config, hostname: Optional[str] = None):
+        """
+        Create SSHManager from configuration
+        
+        Args:
+            config: Config instance
+            hostname: Server hostname (optional)
+            
+        Returns:
+            SSHManager instance
+        """
+        if hostname:
+            server_config = config.get_server(hostname)
+        else:
+            server_config = config.get_default_server()
+        
+        return SSHManager(
+            hostname=server_config.get('hostname'),
+            username=server_config.get('username'),
+            key_file=server_config.get('key_filename'),
+            port=server_config.get('port', 22),
+            timeout=server_config.get('timeout', 30)
+        )

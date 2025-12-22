@@ -148,6 +148,15 @@ class Config:
             logger.warning(f"Error parsing SSH config for host '{host}': {e}")
             return {}
 
+    def get_default_server(self) -> Dict[str, Any]:
+        """
+        Get default server configuration
+        
+        Returns:
+            Default server configuration dictionary
+        """
+        return self.get_server()
+
     def add_server(self, name: str, config: Dict[str, Any]):
         """
         Add or update server configuration

@@ -1,10 +1,12 @@
 """WordPress role management commands"""
 
 import click
+import json
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
+from praisonaiwp.utils.ai_formatter import AIFormatter
 from rich.console import Console
 from rich.table import Table
 
@@ -20,7 +22,9 @@ def role_command():
 
 @role_command.command("list")
 @click.option("--server", default=None, help="Server name from config")
-def list_roles(server):
+@click.option("--ai", "ai_output", is_flag=True, help="Output in AI-friendly JSON format")
+@click.pass_context
+def list_roles(ctx, server, ai_output):
     """
     List WordPress user roles
 
@@ -36,33 +40,53 @@ def list_roles(server):
         server_config = config.get_server(server) if server else config.get_default_server()
 
         if not server_config:
-            console.print(f"[red]Server '{server}' not found in configuration[/red]")
+            error_msg = f"Server '{server}' not found in configuration"
+            if ai_output or ctx.obj.get('ai_mode'):
+                response = AIFormatter.error_response(error_msg, "role list", "NOT_FOUND")
+                click.echo(AIFormatter.format_output(response))
+            else:
+                console.print(f"[red]{error_msg}[/red]")
             return
 
         ssh = SSHManager.from_config(config, server_config.get('hostname', server))
         client = WPClient(ssh, server_config['wp_path'])
 
         roles = client.list_roles()
-
+        
         if not roles:
-            console.print("[yellow]No roles found[/yellow]")
+            message = "No roles found"
+            if ai_output or ctx.obj.get('ai_mode'):
+                response = AIFormatter.list_response([], 0, "role list")
+                click.echo(AIFormatter.format_output(response))
+            else:
+                console.print(f"[yellow]{message}[/yellow]")
             return
 
-        # Create table
-        table = Table(title="WordPress User Roles")
-        table.add_column("Name", style="cyan", no_wrap=True)
-        table.add_column("Display Name", style="green")
+        # AI output
+        if ai_output or ctx.obj.get('ai_mode'):
+            response = AIFormatter.list_response(roles, len(roles), "role list")
+            click.echo(AIFormatter.format_output(response))
+        else:
+            # Create table
+            table = Table(title="WordPress User Roles")
+            table.add_column("Name", style="cyan", no_wrap=True)
+            table.add_column("Display Name", style="green")
 
-        for role in roles:
-            table.add_row(
-                role.get('name', 'N/A'),
-                role.get('display_name', 'N/A')
-            )
+            for role in roles:
+                table.add_row(
+                    role.get('name', 'N/A'),
+                    role.get('display_name', 'N/A')
+                )
 
-        console.print(table)
+            console.print(table)
 
     except Exception as e:
-        console.print(f"[red]Error: {e}[/red]")
+        error_msg = str(e)
+        if ai_output or ctx.obj.get('ai_mode'):
+            response = AIFormatter.error_response(error_msg, "role list", "CONNECTION_ERROR")
+            click.echo(AIFormatter.format_output(response))
+        else:
+            console.print(f"[red]Error: {e}[/red]")
         logger.error(f"List roles failed: {e}")
         raise click.Abort() from None
 

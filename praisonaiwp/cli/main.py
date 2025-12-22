@@ -48,12 +48,22 @@ except ImportError:
 
 
 @click.group()
-@click.version_option(version=__version__)
-def cli():
+@click.option('--version', is_flag=True, help='Show version and exit.')
+@click.option('--ai', 'ai_mode', is_flag=True, help='Enable AI-friendly JSON output for machine parsing')
+@click.pass_context
+def cli(ctx, version, ai_mode):
     """
     PraisonAIWP - AI-powered WordPress content management
 
     Simple, powerful WordPress automation via WP-CLI over SSH.
+
+    \b
+    AI-FRIENDLY USAGE:
+    ------------------
+    Use --ai flag for machine-readable JSON output:
+    praisonaiwp --ai create "Post Title" --content "<p>Content</p>"
+    
+    AI output includes structured data, error codes, and suggestions.
 
     \b
     PREFERRED CONTENT STRUCTURE:
@@ -173,7 +183,14 @@ def cli():
         # List posts
         praisonaiwp list --type page
     """
-    pass
+    if version:
+        click.echo(__version__)
+        return
+    
+    # Ensure context object exists and pass AI mode
+    if ctx.obj is None:
+        ctx.obj = {}
+    ctx.obj['ai_mode'] = ai_mode
 
 
 # Register commands
