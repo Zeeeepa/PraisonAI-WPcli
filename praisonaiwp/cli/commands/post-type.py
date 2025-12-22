@@ -45,7 +45,7 @@ def list_post_types(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -60,7 +60,7 @@ def list_post_types(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type list", "POST_TYPE_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def list_post_types(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "post-type list", "post-type list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -90,7 +90,7 @@ def list_post_types(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "post-type list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -121,7 +121,7 @@ def get_post_type(ctx, post_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -136,7 +136,7 @@ def get_post_type(ctx, post_type, server, json_output):
 
         if result is None:
             error_msg = f"Post type '{post_type}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -144,7 +144,7 @@ def get_post_type(ctx, post_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "post-type get", "post-type get")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -161,7 +161,7 @@ def get_post_type(ctx, post_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "post-type get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -200,7 +200,7 @@ def create_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type create", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -215,7 +215,7 @@ def create_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
         if not success:
             error_msg = "Failed to create post type"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type create", "POST_TYPE_CREATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -223,7 +223,7 @@ def create_post_type(ctx, post_type, label, slug, public, has_archive, supports,
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"post_type": post_type, "label": label, "slug": slug, "public": public, "has_archive": has_archive, "supports": supports},
                 "post-type create",
@@ -244,7 +244,7 @@ def create_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "post-type create", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -276,7 +276,7 @@ def delete_post_type(ctx, post_type, force, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type delete", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -291,7 +291,7 @@ def delete_post_type(ctx, post_type, force, server, json_output):
 
         if not success:
             error_msg = "Failed to delete post type"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type delete", "POST_TYPE_DELETE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -299,7 +299,7 @@ def delete_post_type(ctx, post_type, force, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"post_type": post_type, "deleted": True, "force": force},
                 "post-type delete",
@@ -312,7 +312,7 @@ def delete_post_type(ctx, post_type, force, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "post-type delete", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -348,7 +348,7 @@ def update_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type update", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -373,7 +373,7 @@ def update_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
         if not update_params:
             error_msg = "No update parameters provided"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type update", "NO_PARAMS")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -385,7 +385,7 @@ def update_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
         if not success:
             error_msg = "Failed to update post type"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "post-type update", "POST_TYPE_UPDATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -393,7 +393,7 @@ def update_post_type(ctx, post_type, label, slug, public, has_archive, supports,
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"post_type": post_type, "updated": True, "changes": update_params},
                 "post-type update",
@@ -407,7 +407,7 @@ def update_post_type(ctx, post_type, label, slug, public, has_archive, supports,
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "post-type update", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

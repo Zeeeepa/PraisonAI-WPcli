@@ -45,7 +45,7 @@ def list_sites(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -60,7 +60,7 @@ def list_sites(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site list", "SITE_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def list_sites(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "site list", "site list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -92,7 +92,7 @@ def list_sites(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -123,7 +123,7 @@ def get_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -138,7 +138,7 @@ def get_site(ctx, site_id, server, json_output):
 
         if result is None:
             error_msg = f"Site '{site_id}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -146,7 +146,7 @@ def get_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "site get", "site get")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -163,7 +163,7 @@ def get_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -201,7 +201,7 @@ def create_site(ctx, url, title, email, site_id, private, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site create", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -216,7 +216,7 @@ def create_site(ctx, url, title, email, site_id, private, server, json_output):
 
         if not success:
             error_msg = "Failed to create site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site create", "SITE_CREATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -224,7 +224,7 @@ def create_site(ctx, url, title, email, site_id, private, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"url": url, "title": title, "email": email, "site_id": site_id, "private": private},
                 "site create",
@@ -242,7 +242,7 @@ def create_site(ctx, url, title, email, site_id, private, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site create", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -274,7 +274,7 @@ def delete_site(ctx, site_id, keep_tables, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site delete", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -289,7 +289,7 @@ def delete_site(ctx, site_id, keep_tables, server, json_output):
 
         if not success:
             error_msg = "Failed to delete site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site delete", "SITE_DELETE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -297,7 +297,7 @@ def delete_site(ctx, site_id, keep_tables, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "deleted": True, "keep_tables": keep_tables},
                 "site delete",
@@ -310,7 +310,7 @@ def delete_site(ctx, site_id, keep_tables, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site delete", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -338,7 +338,7 @@ def activate_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site activate", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -353,7 +353,7 @@ def activate_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to activate site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site activate", "SITE_ACTIVATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -361,7 +361,7 @@ def activate_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "activated": True},
                 "site activate",
@@ -373,7 +373,7 @@ def activate_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site activate", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -401,7 +401,7 @@ def deactivate_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site deactivate", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -416,7 +416,7 @@ def deactivate_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to deactivate site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site deactivate", "SITE_DEACTIVATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -424,7 +424,7 @@ def deactivate_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "deactivated": True},
                 "site deactivate",
@@ -436,7 +436,7 @@ def deactivate_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site deactivate", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -464,7 +464,7 @@ def archive_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site archive", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -479,7 +479,7 @@ def archive_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to archive site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site archive", "SITE_ARCHIVE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -487,7 +487,7 @@ def archive_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "archived": True},
                 "site archive",
@@ -499,7 +499,7 @@ def archive_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site archive", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -527,7 +527,7 @@ def unarchive_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site unarchive", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -542,7 +542,7 @@ def unarchive_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to unarchive site"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site unarchive", "SITE_UNARCHIVE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -550,7 +550,7 @@ def unarchive_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "unarchived": True},
                 "site unarchive",
@@ -562,7 +562,7 @@ def unarchive_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site unarchive", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -590,7 +590,7 @@ def spam_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site spam", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -605,7 +605,7 @@ def spam_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to mark site as spam"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site spam", "SITE_SPAM_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -613,7 +613,7 @@ def spam_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "spammed": True},
                 "site spam",
@@ -625,7 +625,7 @@ def spam_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site spam", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -653,7 +653,7 @@ def unspam_site(ctx, site_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site unspam", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -668,7 +668,7 @@ def unspam_site(ctx, site_id, server, json_output):
 
         if not success:
             error_msg = "Failed to unmark site as spam"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "site unspam", "SITE_UNSPAM_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -676,7 +676,7 @@ def unspam_site(ctx, site_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"site_id": site_id, "unspammed": True},
                 "site unspam",
@@ -688,7 +688,7 @@ def unspam_site(ctx, site_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "site unspam", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

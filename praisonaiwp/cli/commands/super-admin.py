@@ -45,7 +45,7 @@ def list_super_admins(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -60,7 +60,7 @@ def list_super_admins(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin list", "SUPER_ADMIN_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def list_super_admins(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "super-admin list", "super-admin list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -91,7 +91,7 @@ def list_super_admins(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "super-admin list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -122,7 +122,7 @@ def add_super_admin(ctx, user_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin add", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -137,7 +137,7 @@ def add_super_admin(ctx, user_id, server, json_output):
 
         if not success:
             error_msg = "Failed to add super admin"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin add", "SUPER_ADMIN_ADD_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -145,7 +145,7 @@ def add_super_admin(ctx, user_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"user_id": user_id, "added": True},
                 "super-admin add",
@@ -157,7 +157,7 @@ def add_super_admin(ctx, user_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "super-admin add", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -188,7 +188,7 @@ def remove_super_admin(ctx, user_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin remove", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -203,7 +203,7 @@ def remove_super_admin(ctx, user_id, server, json_output):
 
         if not success:
             error_msg = "Failed to remove super admin"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "super-admin remove", "SUPER_ADMIN_REMOVE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -211,7 +211,7 @@ def remove_super_admin(ctx, user_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"user_id": user_id, "removed": True},
                 "super-admin remove",
@@ -223,7 +223,7 @@ def remove_super_admin(ctx, user_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "super-admin remove", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

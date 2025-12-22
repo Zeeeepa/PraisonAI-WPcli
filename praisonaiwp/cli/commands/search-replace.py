@@ -56,7 +56,7 @@ def run_search_replace(ctx, search, replace, table, dry_run, regex, server, json
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace run", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -71,7 +71,7 @@ def run_search_replace(ctx, search, replace, table, dry_run, regex, server, json
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace run", "SEARCH_REPLACE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -79,7 +79,7 @@ def run_search_replace(ctx, search, replace, table, dry_run, regex, server, json
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "search-replace operation", "search-replace run")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -116,7 +116,7 @@ def run_search_replace(ctx, search, replace, table, dry_run, regex, server, json
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "search-replace run", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -146,7 +146,7 @@ def optimize_database(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-optimize", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -161,7 +161,7 @@ def optimize_database(ctx, server, json_output):
 
         if not success:
             error_msg = "Failed to optimize database"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-optimize", "DB_OPTIMIZE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -169,7 +169,7 @@ def optimize_database(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"optimized": True},
                 "database optimization",
@@ -181,7 +181,7 @@ def optimize_database(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "search-replace db-optimize", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -211,7 +211,7 @@ def repair_database(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-repair", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -226,7 +226,7 @@ def repair_database(ctx, server, json_output):
 
         if not success:
             error_msg = "Failed to repair database"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-repair", "DB_REPAIR_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -234,7 +234,7 @@ def repair_database(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"repaired": True},
                 "database repair",
@@ -246,7 +246,7 @@ def repair_database(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "search-replace db-repair", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -276,7 +276,7 @@ def check_database(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-check", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -291,7 +291,7 @@ def check_database(ctx, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "search-replace db-check", "DB_CHECK_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -299,7 +299,7 @@ def check_database(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "database check", "search-replace db-check")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -316,7 +316,7 @@ def check_database(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "search-replace db-check", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

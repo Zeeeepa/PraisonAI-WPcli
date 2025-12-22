@@ -42,7 +42,7 @@ def list_roles(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "role list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -56,7 +56,7 @@ def list_roles(ctx, server, json_output):
 
         if not roles:
             message = "No roles found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.list_response([], 0, "role list")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -64,7 +64,7 @@ def list_roles(ctx, server, json_output):
             return
 
         # JSON output for scripting
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.list_response(roles, len(roles), "role list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -83,7 +83,7 @@ def list_roles(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "role list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

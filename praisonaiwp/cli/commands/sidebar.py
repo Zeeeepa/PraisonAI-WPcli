@@ -41,7 +41,7 @@ def list_sidebars(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -56,7 +56,7 @@ def list_sidebars(ctx, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar list", "SIDEBAR_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -64,7 +64,7 @@ def list_sidebars(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "sidebar list", "sidebar list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -91,7 +91,7 @@ def list_sidebars(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -122,7 +122,7 @@ def get_sidebar(ctx, sidebar_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -137,7 +137,7 @@ def get_sidebar(ctx, sidebar_id, server, json_output):
 
         if result is None:
             error_msg = f"Sidebar '{sidebar_id}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -145,7 +145,7 @@ def get_sidebar(ctx, sidebar_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "sidebar get", "sidebar get")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -162,7 +162,7 @@ def get_sidebar(ctx, sidebar_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -194,7 +194,7 @@ def update_sidebar(ctx, sidebar_id, widgets, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar update", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -209,7 +209,7 @@ def update_sidebar(ctx, sidebar_id, widgets, server, json_output):
 
         if not success:
             error_msg = "Failed to update sidebar"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar update", "SIDEBAR_UPDATE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -217,7 +217,7 @@ def update_sidebar(ctx, sidebar_id, widgets, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"sidebar_id": sidebar_id, "widgets": list(widgets)},
                 "sidebar update",
@@ -233,7 +233,7 @@ def update_sidebar(ctx, sidebar_id, widgets, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar update", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -266,7 +266,7 @@ def add_widget(ctx, sidebar_id, widget_id, position, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar add-widget", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -281,7 +281,7 @@ def add_widget(ctx, sidebar_id, widget_id, position, server, json_output):
 
         if not success:
             error_msg = "Failed to add widget to sidebar"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar add-widget", "SIDEBAR_ADD_WIDGET_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -289,7 +289,7 @@ def add_widget(ctx, sidebar_id, widget_id, position, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"sidebar_id": sidebar_id, "widget_id": widget_id, "position": position},
                 "sidebar add-widget",
@@ -303,7 +303,7 @@ def add_widget(ctx, sidebar_id, widget_id, position, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar add-widget", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -332,7 +332,7 @@ def remove_widget(ctx, sidebar_id, widget_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar remove-widget", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -347,7 +347,7 @@ def remove_widget(ctx, sidebar_id, widget_id, server, json_output):
 
         if not success:
             error_msg = "Failed to remove widget from sidebar"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar remove-widget", "SIDEBAR_REMOVE_WIDGET_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -355,7 +355,7 @@ def remove_widget(ctx, sidebar_id, widget_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"sidebar_id": sidebar_id, "widget_id": widget_id, "removed": True},
                 "sidebar remove-widget",
@@ -367,7 +367,7 @@ def remove_widget(ctx, sidebar_id, widget_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar remove-widget", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -395,7 +395,7 @@ def empty_sidebar(ctx, sidebar_id, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar empty", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -410,7 +410,7 @@ def empty_sidebar(ctx, sidebar_id, server, json_output):
 
         if not success:
             error_msg = "Failed to empty sidebar"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "sidebar empty", "SIDEBAR_EMPTY_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -418,7 +418,7 @@ def empty_sidebar(ctx, sidebar_id, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"sidebar_id": sidebar_id, "emptied": True},
                 "sidebar empty",
@@ -430,7 +430,7 @@ def empty_sidebar(ctx, sidebar_id, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "sidebar empty", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

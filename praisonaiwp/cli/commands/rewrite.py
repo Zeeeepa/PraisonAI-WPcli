@@ -45,7 +45,7 @@ def list_rewrite(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -60,7 +60,7 @@ def list_rewrite(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite list", "REWRITE_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def list_rewrite(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "rewrite list", "rewrite list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -91,7 +91,7 @@ def list_rewrite(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "rewrite list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -121,7 +121,7 @@ def flush_rewrite(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite flush", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -136,7 +136,7 @@ def flush_rewrite(ctx, server, json_output):
 
         if not success:
             error_msg = "Failed to flush rewrite rules"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite flush", "REWRITE_FLUSH_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -144,7 +144,7 @@ def flush_rewrite(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"flushed": True},
                 "rewrite flush",
@@ -156,7 +156,7 @@ def flush_rewrite(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "rewrite flush", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -189,7 +189,7 @@ def set_structure(ctx, structure, category_base, tag_base, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite structure", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -204,7 +204,7 @@ def set_structure(ctx, structure, category_base, tag_base, server, json_output):
 
         if not success:
             error_msg = "Failed to update permalink structure"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite structure", "REWRITE_STRUCTURE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -212,7 +212,7 @@ def set_structure(ctx, structure, category_base, tag_base, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"structure": structure, "category_base": category_base, "tag_base": tag_base},
                 "permalink structure update",
@@ -228,7 +228,7 @@ def set_structure(ctx, structure, category_base, tag_base, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "rewrite structure", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -259,7 +259,7 @@ def get_rewrite(ctx, type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -274,7 +274,7 @@ def get_rewrite(ctx, type, server, json_output):
 
         if rule is None:
             error_msg = f"Rewrite rule '{type}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -282,7 +282,7 @@ def get_rewrite(ctx, type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"type": type, "rule": rule},
                 "rewrite get",
@@ -301,7 +301,7 @@ def get_rewrite(ctx, type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "rewrite get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -333,7 +333,7 @@ def set_rewrite(ctx, type, rule, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite set", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -348,7 +348,7 @@ def set_rewrite(ctx, type, rule, server, json_output):
 
         if not success:
             error_msg = "Failed to set rewrite rule"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "rewrite set", "REWRITE_SET_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -356,7 +356,7 @@ def set_rewrite(ctx, type, rule, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"type": type, "rule": rule, "set": True},
                 "rewrite set",
@@ -369,7 +369,7 @@ def set_rewrite(ctx, type, rule, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "rewrite set", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

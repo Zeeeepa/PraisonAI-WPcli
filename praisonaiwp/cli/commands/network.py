@@ -45,7 +45,7 @@ def network_meta_get(ctx, meta_key, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -60,7 +60,7 @@ def network_meta_get(ctx, meta_key, server, json_output):
 
         if result is None:
             error_msg = f"Network meta key '{meta_key}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def network_meta_get(ctx, meta_key, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"meta_key": meta_key, "meta_value": result},
                 "network meta get",
@@ -80,7 +80,7 @@ def network_meta_get(ctx, meta_key, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network meta get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -109,7 +109,7 @@ def network_meta_set(ctx, meta_key, meta_value, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta set", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -124,7 +124,7 @@ def network_meta_set(ctx, meta_key, meta_value, server, json_output):
 
         if not success:
             error_msg = "Failed to set network meta"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta set", "NETWORK_META_SET_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -132,7 +132,7 @@ def network_meta_set(ctx, meta_key, meta_value, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"meta_key": meta_key, "meta_value": meta_value, "set": True},
                 "network meta set",
@@ -144,7 +144,7 @@ def network_meta_set(ctx, meta_key, meta_value, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network meta set", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -172,7 +172,7 @@ def network_meta_delete(ctx, meta_key, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta delete", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -187,7 +187,7 @@ def network_meta_delete(ctx, meta_key, server, json_output):
 
         if not success:
             error_msg = "Failed to delete network meta"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta delete", "NETWORK_META_DELETE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -195,7 +195,7 @@ def network_meta_delete(ctx, meta_key, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"meta_key": meta_key, "deleted": True},
                 "network meta delete",
@@ -207,7 +207,7 @@ def network_meta_delete(ctx, meta_key, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network meta delete", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -238,7 +238,7 @@ def network_meta_list(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -253,7 +253,7 @@ def network_meta_list(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network meta list", "NETWORK_META_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -261,7 +261,7 @@ def network_meta_list(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "network meta list", "network meta list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -284,7 +284,7 @@ def network_meta_list(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network meta list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -318,7 +318,7 @@ def network_option_get(ctx, option_name, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -333,7 +333,7 @@ def network_option_get(ctx, option_name, server, json_output):
 
         if result is None:
             error_msg = f"Network option '{option_name}' not found"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option get", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -341,7 +341,7 @@ def network_option_get(ctx, option_name, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"option_name": option_name, "option_value": result},
                 "network option get",
@@ -353,7 +353,7 @@ def network_option_get(ctx, option_name, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network option get", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -382,7 +382,7 @@ def network_option_set(ctx, option_name, option_value, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option set", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -397,7 +397,7 @@ def network_option_set(ctx, option_name, option_value, server, json_output):
 
         if not success:
             error_msg = "Failed to set network option"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option set", "NETWORK_OPTION_SET_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -405,7 +405,7 @@ def network_option_set(ctx, option_name, option_value, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"option_name": option_name, "option_value": option_value, "set": True},
                 "network option set",
@@ -417,7 +417,7 @@ def network_option_set(ctx, option_name, option_value, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network option set", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -445,7 +445,7 @@ def network_option_delete(ctx, option_name, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option delete", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -460,7 +460,7 @@ def network_option_delete(ctx, option_name, server, json_output):
 
         if not success:
             error_msg = "Failed to delete network option"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option delete", "NETWORK_OPTION_DELETE_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -468,7 +468,7 @@ def network_option_delete(ctx, option_name, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"option_name": option_name, "deleted": True},
                 "network option delete",
@@ -480,7 +480,7 @@ def network_option_delete(ctx, option_name, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network option delete", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -511,7 +511,7 @@ def network_option_list(ctx, format_type, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option list", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -526,7 +526,7 @@ def network_option_list(ctx, format_type, server, json_output):
 
         if "error" in result:
             error_msg = result["error"]
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "network option list", "NETWORK_OPTION_LIST_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -534,7 +534,7 @@ def network_option_list(ctx, format_type, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(result, "network option list", "network option list")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -556,7 +556,7 @@ def network_option_list(ctx, format_type, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "network option list", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:

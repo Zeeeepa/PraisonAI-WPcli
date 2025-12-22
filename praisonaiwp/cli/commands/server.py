@@ -53,7 +53,7 @@ def start_server(ctx, host, port, config, docroot, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "server start", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -68,7 +68,7 @@ def start_server(ctx, host, port, config, docroot, server, json_output):
 
         if not server_url:
             error_msg = "Failed to start development server"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "server start", "SERVER_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -76,7 +76,7 @@ def start_server(ctx, host, port, config, docroot, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"url": server_url, "host": host, "port": port},
                 "development server",
@@ -114,7 +114,7 @@ def start_server(ctx, host, port, config, docroot, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "server start", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
@@ -144,7 +144,7 @@ def open_shell(ctx, server, json_output):
 
         if not server_config:
             error_msg = f"Server '{server}' not found in configuration"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "server shell", "NOT_FOUND")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -159,7 +159,7 @@ def open_shell(ctx, server, json_output):
 
         if not shell_prompt:
             error_msg = "Failed to open PHP shell"
-            if json_output or ctx.obj.get('json_output'):
+            if json_output or (ctx.obj and ctx.obj.get('json_output')):
                 response = AIFormatter.error_response(error_msg, "server shell", "SHELL_ERROR")
                 click.echo(AIFormatter.format_output(response))
             else:
@@ -167,7 +167,7 @@ def open_shell(ctx, server, json_output):
             return
 
         # Output results
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.create_response(
                 {"prompt": shell_prompt, "type": "interactive"},
                 "PHP shell",
@@ -182,7 +182,7 @@ def open_shell(ctx, server, json_output):
 
     except Exception as e:
         error_msg = str(e)
-        if json_output or ctx.obj.get('json_output'):
+        if json_output or (ctx.obj and ctx.obj.get('json_output')):
             response = AIFormatter.error_response(error_msg, "server shell", "CONNECTION_ERROR")
             click.echo(AIFormatter.format_output(response))
         else:
