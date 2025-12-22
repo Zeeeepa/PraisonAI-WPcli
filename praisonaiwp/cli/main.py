@@ -29,6 +29,8 @@ from praisonaiwp.cli.commands.transient import transient_command
 from praisonaiwp.cli.commands.update import update_command
 from praisonaiwp.cli.commands.user import user_command
 from praisonaiwp.cli.commands.widget import widget_command
+from praisonaiwp.cli.commands.role import role_command
+from praisonaiwp.cli.commands.scaffold import scaffold_command
 
 # Try to import AI commands (optional)
 try:
@@ -201,6 +203,8 @@ cli.add_command(cron_command, name='cron')
 cli.add_command(taxonomy_command, name='taxonomy')
 cli.add_command(term_command, name='term')
 cli.add_command(widget_command, name='widget')
+cli.add_command(role_command, name='role')
+cli.add_command(scaffold_command, name='scaffold')
 
 # Register AI commands if available
 if AI_COMMANDS_AVAILABLE:

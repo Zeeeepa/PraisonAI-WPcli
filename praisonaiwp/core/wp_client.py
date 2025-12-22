@@ -2001,3 +2001,233 @@ class WPClient:
         except WPCLIError as e:
             logger.error(f"Failed to update widget: {e}")
             return False
+
+    def list_roles(self) -> List[Dict[str, Any]]:
+        """
+        List WordPress user roles
+        
+        Returns:
+            List of role dictionaries
+        """
+        try:
+            cmd = "role list --format=json"
+            result = self._execute_wp(cmd)
+            roles = json.loads(result)
+
+            logger.debug(f"Retrieved {len(roles)} roles")
+            return roles
+        except WPCLIError as e:
+            logger.error(f"Failed to list roles: {e}")
+            return []
+
+    def get_role(self, role: str) -> Optional[Dict[str, Any]]:
+        """
+        Get WordPress role information
+        
+        Args:
+            role: Role name
+            
+        Returns:
+            Role dictionary or None
+        """
+        try:
+            cmd = f"role get {role} --format=json"
+            result = self._execute_wp(cmd)
+            role_info = json.loads(result)
+
+            logger.debug(f"Retrieved role info for {role}")
+            return role_info
+        except WPCLIError:
+            logger.warning(f"Role '{role}' not found")
+            return None
+
+    def create_role(self, role_key: str, role_name: str, capabilities: Optional[str] = None) -> bool:
+        """
+        Create a WordPress user role
+        
+        Args:
+            role_key: Role key/slug
+            role_name: Role display name
+            capabilities: Comma-separated list of capabilities
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd_parts = ["role", "create", role_key, f"'{role_name}'"]
+
+            if capabilities:
+                cmd_parts.append(f"--capabilities={capabilities}")
+
+            cmd = " ".join(cmd_parts)
+            self._execute_wp(cmd)
+
+            logger.info(f"Created role '{role_key}' with name '{role_name}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to create role: {e}")
+            return False
+
+    def delete_role(self, role: str) -> bool:
+        """
+        Delete a WordPress user role
+        
+        Args:
+            role: Role name
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd = f"role delete {role}"
+            self._execute_wp(cmd)
+            
+            logger.info(f"Deleted role '{role}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to delete role: {e}")
+            return False
+    
+    def scaffold_post_type(self, slug: str, label: Optional[str] = None, 
+                          public: Optional[str] = None, has_archive: Optional[str] = None,
+                          supports: Optional[str] = None) -> bool:
+        """
+        Generate a custom post type
+        
+        Args:
+            slug: Post type slug
+            label: Post type label (optional)
+            public: Whether public (optional)
+            has_archive: Whether has archive (optional)
+            supports: Supported features (optional)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd_parts = ["scaffold", "post-type", slug]
+            
+            if label:
+                cmd_parts.append(f"--label='{label}'")
+            if public:
+                cmd_parts.append(f"--public={public}")
+            if has_archive:
+                cmd_parts.append(f"--has_archive={has_archive}")
+            if supports:
+                cmd_parts.append(f"--supports={supports}")
+            
+            cmd = " ".join(cmd_parts)
+            self._execute_wp(cmd)
+            
+            logger.info(f"Generated post type '{slug}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to generate post type: {e}")
+            return False
+    
+    def scaffold_taxonomy(self, slug: str, label: Optional[str] = None,
+                         public: Optional[str] = None, hierarchical: Optional[str] = None,
+                         post_types: Optional[str] = None) -> bool:
+        """
+        Generate a custom taxonomy
+        
+        Args:
+            slug: Taxonomy slug
+            label: Taxonomy label (optional)
+            public: Whether public (optional)
+            hierarchical: Whether hierarchical (optional)
+            post_types: Associated post types (optional)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd_parts = ["scaffold", "taxonomy", slug]
+            
+            if label:
+                cmd_parts.append(f"--label='{label}'")
+            if public:
+                cmd_parts.append(f"--public={public}")
+            if hierarchical:
+                cmd_parts.append(f"--hierarchical={hierarchical}")
+            if post_types:
+                cmd_parts.append(f"--post_types={post_types}")
+            
+            cmd = " ".join(cmd_parts)
+            self._execute_wp(cmd)
+            
+            logger.info(f"Generated taxonomy '{slug}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to generate taxonomy: {e}")
+            return False
+    
+    def scaffold_plugin(self, slug: str, plugin_name: Optional[str] = None,
+                       plugin_uri: Optional[str] = None, author: Optional[str] = None) -> bool:
+        """
+        Generate a WordPress plugin
+        
+        Args:
+            slug: Plugin slug
+            plugin_name: Plugin name (optional)
+            plugin_uri: Plugin URI (optional)
+            author: Plugin author (optional)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd_parts = ["scaffold", "plugin", slug]
+            
+            if plugin_name:
+                cmd_parts.append(f"--plugin_name='{plugin_name}'")
+            if plugin_uri:
+                cmd_parts.append(f"--plugin_uri='{plugin_uri}'")
+            if author:
+                cmd_parts.append(f"--author='{author}'")
+            
+            cmd = " ".join(cmd_parts)
+            self._execute_wp(cmd)
+            
+            logger.info(f"Generated plugin '{slug}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to generate plugin: {e}")
+            return False
+    
+    def scaffold_theme(self, slug: str, theme_name: Optional[str] = None,
+                      theme_uri: Optional[str] = None, author: Optional[str] = None,
+                      author_uri: Optional[str] = None) -> bool:
+        """
+        Generate a WordPress theme
+        
+        Args:
+            slug: Theme slug
+            theme_name: Theme name (optional)
+            theme_uri: Theme URI (optional)
+            author: Theme author (optional)
+            author_uri: Author URI (optional)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            cmd_parts = ["scaffold", "theme", slug]
+            
+            if theme_name:
+                cmd_parts.append(f"--theme_name='{theme_name}'")
+            if theme_uri:
+                cmd_parts.append(f"--theme_uri='{theme_uri}'")
+            if author:
+                cmd_parts.append(f"--author='{author}'")
+            if author_uri:
+                cmd_parts.append(f"--author_uri='{author_uri}'")
+            
+            cmd = " ".join(cmd_parts)
+            self._execute_wp(cmd)
+            
+            logger.info(f"Generated theme '{slug}'")
+            return True
+        except WPCLIError as e:
+            logger.error(f"Failed to generate theme: {e}")
+            return False
