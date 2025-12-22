@@ -17,6 +17,7 @@ from praisonaiwp.cli.commands.option import option_command
 from praisonaiwp.cli.commands.meta import meta_command
 from praisonaiwp.cli.commands.comment import comment_command
 from praisonaiwp.cli.commands.system import system_command
+from praisonaiwp.cli.commands.theme import theme_command
 
 # Try to import AI commands (optional)
 try:
@@ -178,6 +179,7 @@ cli.add_command(option_command, name='option')
 cli.add_command(meta_command, name='meta')
 cli.add_command(comment_command, name='comment')
 cli.add_command(system_command, name='system')
+cli.add_command(theme_command, name='theme')
 
 # Register AI commands if available
 if AI_COMMANDS_AVAILABLE:
