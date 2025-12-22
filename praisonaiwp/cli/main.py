@@ -21,6 +21,8 @@ from praisonaiwp.cli.commands.meta import meta_command
 from praisonaiwp.cli.commands.option import option_command
 from praisonaiwp.cli.commands.plugin import plugin
 from praisonaiwp.cli.commands.post import post_command
+from praisonaiwp.cli.commands.role import role_command
+from praisonaiwp.cli.commands.scaffold import scaffold_command
 from praisonaiwp.cli.commands.system import system_command
 from praisonaiwp.cli.commands.taxonomy import taxonomy_command
 from praisonaiwp.cli.commands.term import term_command
@@ -29,8 +31,6 @@ from praisonaiwp.cli.commands.transient import transient_command
 from praisonaiwp.cli.commands.update import update_command
 from praisonaiwp.cli.commands.user import user_command
 from praisonaiwp.cli.commands.widget import widget_command
-from praisonaiwp.cli.commands.role import role_command
-from praisonaiwp.cli.commands.scaffold import scaffold_command
 
 # Try to import AI commands (optional)
 try:
@@ -68,7 +68,7 @@ def cli(ctx, version, json_output):
     -----------------------
     For scripting and automation, use --json flag:
     praisonaiwp --json create "Post Title" --content "<p>Content</p>"
-    
+
     JSON output includes structured data and error information for programmatic use.
 
     \b
@@ -186,7 +186,7 @@ def cli(ctx, version, json_output):
     if version:
         click.echo(__version__)
         return
-    
+
     # Ensure context object exists and pass JSON output preference
     if ctx.obj is None:
         ctx.obj = {}

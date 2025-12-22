@@ -1,14 +1,15 @@
 """WordPress role management commands"""
 
+
 import click
-import json
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
-from praisonaiwp.utils.logger import get_logger
 from praisonaiwp.utils.ai_formatter import AIFormatter
-from rich.console import Console
-from rich.table import Table
+from praisonaiwp.utils.logger import get_logger
 
 console = Console()
 logger = get_logger(__name__)
@@ -52,7 +53,7 @@ def list_roles(ctx, server, json_output):
         client = WPClient(ssh, server_config['wp_path'])
 
         roles = client.list_roles()
-        
+
         if not roles:
             message = "No roles found"
             if json_output or ctx.obj.get('json_output'):
@@ -119,14 +120,14 @@ def get_role(role, server):
         role_info = client.get_role(role)
 
         if role_info:
-            console.print(f"[green]Role Information:[/green]")
+            console.print("[green]Role Information:[/green]")
             console.print(f"[cyan]Name:[/cyan] {role_info.get('name', 'N/A')}")
             console.print(f"[cyan]Display Name:[/cyan] {role_info.get('display_name', 'N/A')}")
 
             # Display capabilities if available
             capabilities = role_info.get('capabilities', [])
             if capabilities:
-                console.print(f"[cyan]Capabilities:[/cyan]")
+                console.print("[cyan]Capabilities:[/cyan]")
                 for capability in capabilities:
                     console.print(f"  • {capability}")
         else:
