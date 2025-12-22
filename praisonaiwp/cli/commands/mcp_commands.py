@@ -4,8 +4,9 @@ MCP CLI Commands for PraisonAIWP
 Commands to run and manage the MCP server.
 """
 
-import os
 import json
+import os
+
 import click
 from rich.console import Console
 
@@ -34,12 +35,13 @@ def run(transport, host, port, server):
         praisonaiwp mcp run -t streamable-http # Run with HTTP transport
         praisonaiwp mcp run --server production # Use specific WordPress server
     """
-    import sys
     import shutil
+    import sys
+
     from rich.console import Console
 
     try:
-        from praisonaiwp.mcp.server import run_server, MCP_AVAILABLE
+        from praisonaiwp.mcp.server import MCP_AVAILABLE, run_server
 
         if not MCP_AVAILABLE:
             console.print("[red]Error:[/red] MCP SDK is not installed.")
@@ -142,8 +144,8 @@ def install(name, server):
         praisonaiwp mcp install
         praisonaiwp mcp install --name "My WordPress"
     """
-    import sys
     import shutil
+    import sys
 
     # Find the praisonaiwp executable
     praisonaiwp_path = shutil.which('praisonaiwp')

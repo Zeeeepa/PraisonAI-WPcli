@@ -1,6 +1,6 @@
 """Rate limiting for API calls"""
-import time
 import logging
+import time
 from collections import deque
 from typing import Optional
 

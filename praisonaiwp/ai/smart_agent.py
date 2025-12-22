@@ -1,9 +1,10 @@
 """Smart Content Agent with ServerRouter integration for intelligent posting"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from praisonaiwp.core.router import ServerRouter
+from typing import Any, Dict, List, Optional
+
 from praisonaiwp.ai.integration import PraisonAIWPIntegration
+from praisonaiwp.core.router import ServerRouter
 
 logger = logging.getLogger(__name__)
 

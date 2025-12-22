@@ -2,7 +2,7 @@
 
 # Check if PraisonAI is available
 try:
-    from praisonaiagents import Agent, Task, PraisonAIAgents
+    from praisonaiagents import Agent, PraisonAIAgents, Task
     AI_AVAILABLE = True
 except ImportError:
     AI_AVAILABLE = False

@@ -1,12 +1,13 @@
 """WordPress widget management commands"""
 
 import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -43,7 +44,7 @@ def list_widgets(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         widgets = client.list_widgets()
-        
+
         if not widgets:
             console.print("[yellow]No widgets found[/yellow]")
             return
@@ -95,17 +96,17 @@ def get_widget(widget_id, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         widget_info = client.get_widget(widget_id)
-        
+
         if widget_info:
-            console.print(f"[green]Widget Information:[/green]")
+            console.print("[green]Widget Information:[/green]")
             console.print(f"[cyan]ID:[/cyan] {widget_info.get('id', 'N/A')}")
             console.print(f"[cyan]Name:[/cyan] {widget_info.get('name', 'N/A')}")
             console.print(f"[cyan]Sidebar:[/cyan] {widget_info.get('sidebar', 'N/A')}")
-            
+
             # Display options if available
             options = widget_info.get('options', {})
             if options:
-                console.print(f"[cyan]Options:[/cyan]")
+                console.print("[cyan]Options:[/cyan]")
                 for key, value in options.items():
                     console.print(f"  {key}: {value}")
         else:
@@ -162,7 +163,7 @@ def update_widget(widget_id, title, text, server):
             return
 
         success = client.update_widget(widget_id, options)
-        
+
         if success:
             console.print(f"[green]Successfully updated widget '{widget_id}'[/green]")
             for key, value in options.items():

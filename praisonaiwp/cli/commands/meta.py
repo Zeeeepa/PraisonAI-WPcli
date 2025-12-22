@@ -1,13 +1,14 @@
 """WordPress post and user meta management commands"""
 
+
 import click
-import json
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -39,40 +40,40 @@ def get_post_meta(post_id, key, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             result = wp.get_post_meta(post_id, key)
-            
+
             if isinstance(result, list):
                 # Display as table
                 table = Table(title=f"Post {post_id} Meta Fields")
                 table.add_column("Key", style="cyan")
                 table.add_column("Value", style="green")
-                
+
                 for meta in result:
                     table.add_row(
                         meta.get('meta_key', ''),
                         str(meta.get('meta_value', ''))
                     )
-                
+
                 console.print(table)
             else:
                 # Single value
                 console.print(result)
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Get post meta failed: {e}")
@@ -96,24 +97,24 @@ def set_post_meta(post_id, key, value, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.set_post_meta(post_id, key, value)
             console.print(f"[green]✓ Set meta '{key}' = '{value}' for post {post_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Set post meta failed: {e}")
@@ -137,24 +138,24 @@ def update_post_meta(post_id, key, value, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.update_post_meta(post_id, key, value)
             console.print(f"[green]✓ Updated meta '{key}' = '{value}' for post {post_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Update post meta failed: {e}")
@@ -177,24 +178,24 @@ def delete_post_meta(post_id, key, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.delete_post_meta(post_id, key)
             console.print(f"[green]✓ Deleted meta '{key}' from post {post_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Delete post meta failed: {e}")
@@ -221,40 +222,40 @@ def get_user_meta(user_id, key, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             result = wp.get_user_meta(user_id, key)
-            
+
             if isinstance(result, list):
                 # Display as table
                 table = Table(title=f"User {user_id} Meta Fields")
                 table.add_column("Key", style="cyan")
                 table.add_column("Value", style="green")
-                
+
                 for meta in result:
                     table.add_row(
                         meta.get('meta_key', ''),
                         str(meta.get('meta_value', ''))
                     )
-                
+
                 console.print(table)
             else:
                 # Single value
                 console.print(result)
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Get user meta failed: {e}")
@@ -278,24 +279,24 @@ def set_user_meta(user_id, key, value, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.set_user_meta(user_id, key, value)
             console.print(f"[green]✓ Set meta '{key}' = '{value}' for user {user_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Set user meta failed: {e}")
@@ -319,24 +320,24 @@ def update_user_meta(user_id, key, value, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.update_user_meta(user_id, key, value)
             console.print(f"[green]✓ Updated meta '{key}' = '{value}' for user {user_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Update user meta failed: {e}")
@@ -359,24 +360,24 @@ def delete_user_meta(user_id, key, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.delete_user_meta(user_id, key)
             console.print(f"[green]✓ Deleted meta '{key}' from user {user_id}[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Delete user meta failed: {e}")

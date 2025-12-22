@@ -1,12 +1,13 @@
 """WordPress config management commands"""
 
 import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -47,7 +48,7 @@ def get_config(param, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         value = client.get_config_param(param)
-        
+
         if value is not None:
             console.print(f"[green]{param}:[/green] {value}")
         else:
@@ -89,7 +90,7 @@ def set_config(param, value, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.set_config_param(param, value)
-        
+
         if success:
             console.print(f"[green]Successfully set {param} = {value}[/green]")
         else:
@@ -131,7 +132,7 @@ def list_config(search, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         config_data = client.get_all_config()
-        
+
         if not config_data:
             console.print("[yellow]No configuration found[/yellow]")
             return
@@ -211,7 +212,7 @@ def create_config(dbhost, dbname, dbuser, dbpass, dbprefix, dbcharset, dbscollat
         }
 
         success = client.create_config(config_params, force=force)
-        
+
         if success:
             console.print("[green]wp-config.php created successfully[/green]")
             console.print(f"[cyan]Database:[/cyan] {dbuser}@{dbhost}/{dbname}")
@@ -253,7 +254,7 @@ def config_path(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         config_path = client.get_config_path()
-        
+
         if config_path:
             console.print(f"[green]wp-config.php path:[/green] {config_path}")
         else:

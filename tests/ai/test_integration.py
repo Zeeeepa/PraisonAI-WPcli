@@ -1,7 +1,8 @@
 """Tests for PraisonAI WordPress integration"""
 import os
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 # Check if AI features are available
 try:

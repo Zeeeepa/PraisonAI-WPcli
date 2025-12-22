@@ -1,5 +1,5 @@
 """WordPress tools for PraisonAI agents"""
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 
 class WordPressTools:

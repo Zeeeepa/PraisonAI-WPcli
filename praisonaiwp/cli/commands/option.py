@@ -1,11 +1,12 @@
 """WordPress options management commands"""
 
 import click
+from rich.console import Console
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
 
 console = Console()
 logger = get_logger(__name__)
@@ -35,24 +36,24 @@ def get_option(option_name, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             value = wp.get_option(option_name)
             console.print(value)
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Get option failed: {e}")
@@ -78,24 +79,24 @@ def set_option(option_name, value, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.set_option(option_name, value)
             console.print(f"[green]✓ Set option '{option_name}' = '{value}'[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Set option failed: {e}")
@@ -121,24 +122,24 @@ def delete_option(option_name, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             wp.delete_option(option_name)
             console.print(f"[green]✓ Deleted option '{option_name}'[/green]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Delete option failed: {e}")

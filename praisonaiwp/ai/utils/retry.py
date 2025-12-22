@@ -1,8 +1,8 @@
 """Retry utilities with exponential backoff"""
-import time
 import logging
+import time
 from functools import wraps
-from typing import Callable, Type, Tuple
+from typing import Callable, Tuple, Type
 
 logger = logging.getLogger(__name__)
 

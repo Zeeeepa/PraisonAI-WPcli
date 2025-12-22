@@ -18,15 +18,15 @@ def get_logger(name: str, level: Optional[str] = None) -> logging.Logger:
         Configured logger instance
     """
     logger = logging.getLogger(name)
-    
+
     # Set level
     log_level = level or os.getenv("PRAISONAIWP_LOG_LEVEL", "INFO")
     logger.setLevel(getattr(logging, log_level.upper()))
-    
+
     # Avoid duplicate handlers
     if logger.handlers:
         return logger
-    
+
     # Console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
@@ -35,7 +35,7 @@ def get_logger(name: str, level: Optional[str] = None) -> logging.Logger:
     )
     console_handler.setFormatter(console_format)
     logger.addHandler(console_handler)
-    
+
     # File handler (if log directory exists)
     log_dir = Path.home() / ".praisonaiwp" / "logs"
     if log_dir.exists():
@@ -47,5 +47,5 @@ def get_logger(name: str, level: Optional[str] = None) -> logging.Logger:
         )
         file_handler.setFormatter(file_format)
         logger.addHandler(file_handler)
-    
+
     return logger

@@ -1,12 +1,13 @@
 """WordPress taxonomy management commands"""
 
 import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -43,7 +44,7 @@ def list_taxonomies(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         taxonomies = client.list_taxonomies()
-        
+
         if not taxonomies:
             console.print("[yellow]No taxonomies found[/yellow]")
             return
@@ -97,9 +98,9 @@ def get_taxonomy(taxonomy, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         taxonomy_info = client.get_taxonomy(taxonomy)
-        
+
         if taxonomy_info:
-            console.print(f"[green]Taxonomy Information:[/green]")
+            console.print("[green]Taxonomy Information:[/green]")
             console.print(f"[cyan]Name:[/cyan] {taxonomy_info.get('name', 'N/A')}")
             console.print(f"[cyan]Label:[/cyan] {taxonomy_info.get('label', 'N/A')}")
             console.print(f"[cyan]Hierarchical:[/cyan] {taxonomy_info.get('hierarchical', False)}")

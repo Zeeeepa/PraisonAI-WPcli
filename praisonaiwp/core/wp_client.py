@@ -1,17 +1,18 @@
 """WordPress CLI client for PraisonAIWP"""
 
 import json
-from typing import Any, Optional, Dict, List
+from typing import Any, Dict, List, Optional
+
 from praisonaiwp.core.ssh_manager import SSHManager
-from praisonaiwp.utils.logger import get_logger
 from praisonaiwp.utils.exceptions import WPCLIError
+from praisonaiwp.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class WPClient:
     """WordPress CLI operations wrapper"""
-    
+
     def __init__(
         self,
         ssh: SSHManager,
@@ -34,13 +35,13 @@ class WPClient:
         self.wp_path = wp_path
         self.php_bin = php_bin
         self.wp_cli = wp_cli
-        
+
         logger.debug(f"Initialized WPClient for {wp_path}")
-        
+
         # Verify installation if requested
         if verify_installation:
             self._verify_installation()
-    
+
     def _verify_installation(self):
         """
         Verify WP-CLI and WordPress installation
@@ -51,7 +52,7 @@ class WPClient:
         try:
             # Check if WP-CLI binary exists
             stdout, stderr = self.ssh.execute(f"test -f {self.wp_cli} && echo 'exists' || echo 'not found'")
-            
+
             if 'not found' in stdout:
                 raise WPCLIError(
                     f"WP-CLI not found at {self.wp_cli}\n"
@@ -61,28 +62,28 @@ class WPClient:
                     f"3. Move to path: sudo mv wp-cli.phar {self.wp_cli}\n"
                     f"\nOr specify correct path with --wp-cli option"
                 )
-            
+
             # Check if WordPress directory exists
             stdout, stderr = self.ssh.execute(f"test -d {self.wp_path} && echo 'exists' || echo 'not found'")
-            
+
             if 'not found' in stdout:
                 raise WPCLIError(
                     f"WordPress installation not found at {self.wp_path}\n"
                     f"Please verify the WordPress path is correct."
                 )
-            
+
             # Check if wp-config.php exists
             stdout, stderr = self.ssh.execute(f"test -f {self.wp_path}/wp-config.php && echo 'exists' || echo 'not found'")
-            
+
             if 'not found' in stdout:
                 raise WPCLIError(
                     f"wp-config.php not found in {self.wp_path}\n"
                     f"This doesn't appear to be a valid WordPress installation."
                 )
-            
+
             # Test WP-CLI execution
             stdout, stderr = self.ssh.execute(f"cd {self.wp_path} && {self.php_bin} {self.wp_cli} --version")
-            
+
             if stderr and ('command not found' in stderr.lower() or 'no such file' in stderr.lower()):
                 raise WPCLIError(
                     f"Failed to execute WP-CLI\n"
@@ -93,17 +94,17 @@ class WPClient:
                     f"3. Missing PHP extensions (mysql, mysqli)\n"
                     f"\nFor Plesk servers, try: /opt/plesk/php/8.3/bin/php"
                 )
-            
+
             if 'WP-CLI' in stdout:
                 logger.info(f"WP-CLI verified: {stdout.strip()}")
             else:
                 logger.warning(f"WP-CLI verification returned unexpected output: {stdout}")
-        
+
         except WPCLIError:
             raise
         except Exception as e:
             logger.warning(f"Could not verify WP-CLI installation: {e}")
-    
+
     def wp(self, *args, **kwargs) -> Any:
         """
         Generic WP-CLI command executor - supports ANY WP-CLI command
@@ -143,13 +144,13 @@ class WPClient:
         """
         # Build command from args
         cmd_parts = list(args)
-        
+
         # Add kwargs as flags/options
         auto_parse_json = False
         for key, value in kwargs.items():
             # Convert underscores to hyphens for WP-CLI convention
             flag_key = key.replace('_', '-')
-            
+
             if value is True:
                 # Boolean flag (e.g., --porcelain, --dry-run)
                 cmd_parts.append(f"--{flag_key}")
@@ -157,15 +158,15 @@ class WPClient:
                 # Key-value option
                 if flag_key == 'format' and value == 'json':
                     auto_parse_json = True
-                
+
                 # Escape single quotes in values
                 escaped_value = str(value).replace("'", "'\\''")
                 cmd_parts.append(f"--{flag_key}='{escaped_value}'")
-        
+
         # Execute command
         cmd = ' '.join(cmd_parts)
         result = self._execute_wp(cmd)
-        
+
         # Auto-parse JSON if format=json
         if auto_parse_json and result.strip():
             try:
@@ -173,9 +174,9 @@ class WPClient:
             except json.JSONDecodeError:
                 logger.warning(f"Failed to parse JSON output: {result[:100]}")
                 return result
-        
+
         return result.strip() if result else ""
-    
+
     def _execute_wp(self, command: str) -> str:
         """
         Execute WP-CLI command (internal method)
@@ -190,18 +191,18 @@ class WPClient:
             WPCLIError: If command fails
         """
         full_cmd = f"cd {self.wp_path} && {self.php_bin} {self.wp_cli} {command}"
-        
+
         logger.debug(f"Executing WP-CLI: {command}")
-        
+
         try:
             stdout, stderr = self.ssh.execute(full_cmd)
         except Exception as e:
             raise WPCLIError(f"Failed to execute WP-CLI command: {e}")
-        
+
         # Check for common error patterns
         if stderr:
             error_lower = stderr.lower()
-            
+
             if 'command not found' in error_lower:
                 raise WPCLIError(
                     f"WP-CLI command not found\n"
@@ -210,7 +211,7 @@ class WPClient:
                     f"1. WP-CLI is installed at: {self.wp_cli}\n"
                     f"2. PHP binary is correct: {self.php_bin}"
                 )
-            
+
             if 'no such file or directory' in error_lower:
                 raise WPCLIError(
                     f"File or directory not found\n"
@@ -219,15 +220,15 @@ class WPClient:
                     f"1. WordPress path: {self.wp_path}\n"
                     f"2. WP-CLI path: {self.wp_cli}"
                 )
-            
+
             if 'error:' in error_lower:
                 # Don't log "Term doesn't exist" as error - it's expected when looking up categories by name
                 if "term doesn't exist" not in error_lower:
                     logger.error(f"WP-CLI error: {stderr}")
                 raise WPCLIError(f"WP-CLI error: {stderr}")
-        
+
         return stdout.strip()
-    
+
     def get_post(self, post_id: int, field: Optional[str] = None) -> Any:
         """
         Get post data
@@ -240,7 +241,7 @@ class WPClient:
             Post data (dict if no field specified, str if field specified)
         """
         cmd = f"post get {post_id}"
-        
+
         if field:
             cmd += f" --field={field}"
             result = self._execute_wp(cmd)
@@ -249,7 +250,7 @@ class WPClient:
             cmd += " --format=json"
             result = self._execute_wp(cmd)
             return json.loads(result)
-    
+
     def get_default_user(self) -> Optional[str]:
         """
         Get the default admin user (user with ID 1 or first admin user)
@@ -290,21 +291,21 @@ class WPClient:
             if default_user:
                 kwargs['post_author'] = default_user
                 logger.debug(f"Using default author: {default_user}")
-        
+
         args = []
         for key, value in kwargs.items():
             # Escape single quotes in value
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         cmd = f"post create {' '.join(args)} --porcelain"
         result = self._execute_wp(cmd)
-        
+
         post_id = int(result.strip())
         logger.info(f"Created post ID: {post_id}")
-        
+
         return post_id
-    
+
     def update_post(self, post_id: int, **kwargs) -> bool:
         """
         Update an existing post
@@ -321,13 +322,13 @@ class WPClient:
             # Escape single quotes in value
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         cmd = f"post update {post_id} {' '.join(args)}"
         self._execute_wp(cmd)
-        
+
         logger.info(f"Updated post ID: {post_id}")
         return True
-    
+
     def delete_post(self, post_id: int, force: bool = False) -> bool:
         """
         Delete a post
@@ -342,10 +343,10 @@ class WPClient:
         force_flag = '--force' if force else ''
         cmd = f"post delete {post_id} {force_flag}"
         self._execute_wp(cmd)
-        
+
         logger.info(f"Deleted post ID: {post_id}")
         return True
-    
+
     def post_exists(self, post_id: int) -> bool:
         """
         Check if a post exists
@@ -364,7 +365,7 @@ class WPClient:
         except WPCLIError:
             logger.debug(f"Post {post_id} does not exist")
             return False
-    
+
     def get_post_meta(self, post_id: int, key: str = None) -> Any:
         """
         Get post meta value(s)
@@ -384,7 +385,7 @@ class WPClient:
             cmd = f"post meta list {post_id} --format=json"
             result = self._execute_wp(cmd)
             return json.loads(result)
-    
+
     def set_post_meta(self, post_id: int, key: str, value: str) -> bool:
         """
         Set post meta value
@@ -402,7 +403,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Set meta {key} for post {post_id}")
         return True
-    
+
     def delete_post_meta(self, post_id: int, key: str) -> bool:
         """
         Delete post meta
@@ -418,7 +419,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted meta {key} from post {post_id}")
         return True
-    
+
     def update_post_meta(self, post_id: int, key: str, value: str) -> bool:
         """
         Update post meta value
@@ -436,7 +437,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Updated meta {key} for post {post_id}")
         return True
-    
+
     def list_users(self, **filters) -> List[Dict[str, Any]]:
         """
         List users with filters
@@ -448,15 +449,15 @@ class WPClient:
             List of user dictionaries
         """
         args = ["--format=json"]
-        
+
         for key, value in filters.items():
             args.append(f"--{key}={value}")
-        
+
         cmd = f"user list {' '.join(args)}"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def get_user(self, user_id: int) -> Dict[str, Any]:
         """
         Get user details
@@ -469,9 +470,9 @@ class WPClient:
         """
         cmd = f"user get {user_id} --format=json"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def create_user(self, username: str, email: str, **kwargs) -> int:
         """
         Create a new user
@@ -485,17 +486,17 @@ class WPClient:
             User ID
         """
         args = [username, email]
-        
+
         for key, value in kwargs.items():
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         cmd = f"user create {' '.join(args)} --porcelain"
         result = self._execute_wp(cmd)
         user_id = int(result.strip())
         logger.info(f"Created user {username} with ID {user_id}")
         return user_id
-    
+
     def update_user(self, user_id: int, **kwargs) -> bool:
         """
         Update user fields
@@ -508,16 +509,16 @@ class WPClient:
             True if successful
         """
         args = [str(user_id)]
-        
+
         for key, value in kwargs.items():
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         cmd = f"user update {' '.join(args)}"
         self._execute_wp(cmd)
         logger.info(f"Updated user {user_id}")
         return True
-    
+
     def delete_user(self, user_id: int, reassign: int = None) -> bool:
         """
         Delete a user
@@ -530,15 +531,15 @@ class WPClient:
             True if successful
         """
         args = [str(user_id), "--yes"]
-        
+
         if reassign is not None:
             args.append(f"--reassign={reassign}")
-        
+
         cmd = f"user delete {' '.join(args)}"
         self._execute_wp(cmd)
         logger.info(f"Deleted user {user_id}")
         return True
-    
+
     def get_option(self, option_name: str) -> str:
         """
         Get WordPress option value
@@ -551,9 +552,9 @@ class WPClient:
         """
         cmd = f"option get {option_name}"
         result = self._execute_wp(cmd)
-        
+
         return result.strip()
-    
+
     def set_option(self, option_name: str, value: str) -> bool:
         """
         Set WordPress option value
@@ -570,7 +571,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Set option {option_name}")
         return True
-    
+
     def delete_option(self, option_name: str) -> bool:
         """
         Delete WordPress option
@@ -585,7 +586,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted option {option_name}")
         return True
-    
+
     def list_plugins(self, **filters) -> List[Dict[str, Any]]:
         """
         List installed plugins
@@ -597,15 +598,15 @@ class WPClient:
             List of plugin dictionaries
         """
         args = ["--format=json"]
-        
+
         for key, value in filters.items():
             args.append(f"--{key}={value}")
-        
+
         cmd = f"plugin list {' '.join(args)}"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def list_themes(self, **filters) -> List[Dict[str, Any]]:
         """
         List installed themes
@@ -617,15 +618,15 @@ class WPClient:
             List of theme dictionaries
         """
         args = ["--format=json"]
-        
+
         for key, value in filters.items():
             args.append(f"--{key}={value}")
-        
+
         cmd = f"theme list {' '.join(args)}"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def activate_plugin(self, plugin: str) -> bool:
         """
         Activate a plugin
@@ -640,7 +641,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Activated plugin {plugin}")
         return True
-    
+
     def deactivate_plugin(self, plugin: str) -> bool:
         """
         Deactivate a plugin
@@ -655,7 +656,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deactivated plugin {plugin}")
         return True
-    
+
     def update_plugin(self, plugin: str = "all") -> bool:
         """
         Update one or all plugins
@@ -673,7 +674,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Updated plugin(s): {plugin}")
         return True
-    
+
     def activate_theme(self, theme: str) -> bool:
         """
         Activate a theme
@@ -688,7 +689,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Activated theme {theme}")
         return True
-    
+
     def get_user_meta(self, user_id: int, key: str = None) -> Any:
         """
         Get user meta value(s)
@@ -708,7 +709,7 @@ class WPClient:
             cmd = f"user meta list {user_id} --format=json"
             result = self._execute_wp(cmd)
             return json.loads(result)
-    
+
     def set_user_meta(self, user_id: int, key: str, value: str) -> bool:
         """
         Set user meta value
@@ -726,7 +727,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Set meta {key} for user {user_id}")
         return True
-    
+
     def update_user_meta(self, user_id: int, key: str, value: str) -> bool:
         """
         Update user meta value
@@ -744,7 +745,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Updated meta {key} for user {user_id}")
         return True
-    
+
     def delete_user_meta(self, user_id: int, key: str) -> bool:
         """
         Delete user meta
@@ -760,7 +761,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted meta {key} for user {user_id}")
         return True
-    
+
     def flush_cache(self) -> bool:
         """
         Flush object cache
@@ -772,7 +773,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info("Flushed cache")
         return True
-    
+
     def get_cache_type(self) -> str:
         """
         Get cache type
@@ -783,7 +784,7 @@ class WPClient:
         cmd = "cache type"
         result = self._execute_wp(cmd)
         return result.strip()
-    
+
     def get_transient(self, key: str) -> str:
         """
         Get transient value
@@ -797,7 +798,7 @@ class WPClient:
         cmd = f"transient get {key}"
         result = self._execute_wp(cmd)
         return result.strip()
-    
+
     def set_transient(self, key: str, value: str, expiration: int = None) -> bool:
         """
         Set transient value
@@ -817,7 +818,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Set transient {key}")
         return True
-    
+
     def delete_transient(self, key: str) -> bool:
         """
         Delete transient
@@ -832,7 +833,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted transient {key}")
         return True
-    
+
     def list_menus(self) -> List[Dict[str, Any]]:
         """
         List navigation menus
@@ -843,7 +844,7 @@ class WPClient:
         cmd = "menu list --format=json"
         result = self._execute_wp(cmd)
         return json.loads(result)
-    
+
     def create_menu(self, name: str) -> int:
         """
         Create navigation menu
@@ -859,7 +860,7 @@ class WPClient:
         menu_id = int(result.strip())
         logger.info(f"Created menu {name} with ID {menu_id}")
         return menu_id
-    
+
     def delete_menu(self, menu_id: int) -> bool:
         """
         Delete navigation menu
@@ -874,7 +875,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted menu {menu_id}")
         return True
-    
+
     def add_menu_item(self, menu_id: int, **kwargs) -> int:
         """
         Add item to menu
@@ -893,13 +894,13 @@ class WPClient:
                 args.append(f"--{key}='{escaped_value}'")
             else:
                 args.append(f"--{key}={value}")
-        
+
         cmd = f"menu item add-custom {menu_id} {' '.join(args)} --porcelain"
         result = self._execute_wp(cmd)
         item_id = int(result.strip())
         logger.info(f"Added menu item {item_id} to menu {menu_id}")
         return item_id
-    
+
     def create_term(self, taxonomy: str, name: str, **kwargs) -> int:
         """
         Create a new term
@@ -919,14 +920,14 @@ class WPClient:
                 args.append(f"--{key}='{escaped_value}'")
             else:
                 args.append(f"--{key}={value}")
-        
+
         escaped_name = name.replace("'", "'\\''")
         cmd = f"term create {taxonomy} '{escaped_name}' {' '.join(args)} --porcelain"
         result = self._execute_wp(cmd)
         term_id = int(result.strip())
         logger.info(f"Created term {name} in {taxonomy} with ID {term_id}")
         return term_id
-    
+
     def delete_term(self, taxonomy: str, term_id: int) -> bool:
         """
         Delete a term
@@ -942,7 +943,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Deleted term {term_id} from {taxonomy}")
         return True
-    
+
     def update_term(self, taxonomy: str, term_id: int, **kwargs) -> bool:
         """
         Update a term
@@ -962,12 +963,12 @@ class WPClient:
                 args.append(f"--{key}='{escaped_value}'")
             else:
                 args.append(f"--{key}={value}")
-        
+
         cmd = f"term update {taxonomy} {term_id} {' '.join(args)}"
         self._execute_wp(cmd)
         logger.info(f"Updated term {term_id} in {taxonomy}")
         return True
-    
+
     def get_core_version(self) -> str:
         """
         Get WordPress core version
@@ -978,7 +979,7 @@ class WPClient:
         cmd = "core version"
         result = self._execute_wp(cmd)
         return result.strip()
-    
+
     def core_is_installed(self) -> bool:
         """
         Check if WordPress is installed
@@ -992,7 +993,7 @@ class WPClient:
             return True
         except Exception:
             return False
-    
+
     def import_media(self, file_path: str, post_id: int = None, **kwargs) -> int:
         """
         Import media file to WordPress
@@ -1006,22 +1007,22 @@ class WPClient:
             Attachment ID
         """
         args = [f"'{file_path}'"]
-        
+
         if post_id is not None:
             args.append(f"--post_id={post_id}")
-        
+
         for key, value in kwargs.items():
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         args.append("--porcelain")
-        
+
         cmd = f"media import {' '.join(args)}"
         result = self._execute_wp(cmd)
         attachment_id = int(result.strip())
         logger.info(f"Imported media {file_path} with ID {attachment_id}")
         return attachment_id
-    
+
     def get_media_info(self, attachment_id: int, field: Optional[str] = None) -> Any:
         """
         Get media/attachment information
@@ -1034,7 +1035,7 @@ class WPClient:
             Attachment data (dict if no field specified, str if field specified)
         """
         return self.get_post(attachment_id, field=field)
-    
+
     def get_media_url(self, attachment_id: int) -> str:
         """
         Get media URL
@@ -1048,7 +1049,7 @@ class WPClient:
         url = self.get_post(attachment_id, field='guid')
         logger.info(f"Retrieved URL for attachment {attachment_id}: {url}")
         return url.strip()
-    
+
     def list_media(self, post_id: int = None, **filters) -> List[Dict[str, Any]]:
         """
         List media/attachments
@@ -1061,14 +1062,14 @@ class WPClient:
             List of attachment dictionaries
         """
         list_filters = {'post_type': 'attachment'}
-        
+
         if post_id is not None:
             list_filters['post_parent'] = post_id
-        
+
         list_filters.update(filters)
-        
+
         return self.list_posts(**list_filters)
-    
+
     def list_comments(self, **filters) -> List[Dict[str, Any]]:
         """
         List comments with filters
@@ -1080,15 +1081,15 @@ class WPClient:
             List of comment dictionaries
         """
         args = ["--format=json"]
-        
+
         for key, value in filters.items():
             args.append(f"--{key}={value}")
-        
+
         cmd = f"comment list {' '.join(args)}"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def get_comment(self, comment_id: int) -> Dict[str, Any]:
         """
         Get comment details
@@ -1101,9 +1102,9 @@ class WPClient:
         """
         cmd = f"comment get {comment_id} --format=json"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def create_comment(self, post_id: int, **kwargs) -> int:
         """
         Create a new comment
@@ -1116,19 +1117,19 @@ class WPClient:
             Comment ID
         """
         args = [str(post_id)]
-        
+
         for key, value in kwargs.items():
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         args.append("--porcelain")
-        
+
         cmd = f"comment create {' '.join(args)}"
         result = self._execute_wp(cmd)
         comment_id = int(result.strip())
         logger.info(f"Created comment {comment_id} on post {post_id}")
         return comment_id
-    
+
     def update_comment(self, comment_id: int, **kwargs) -> bool:
         """
         Update comment fields
@@ -1141,16 +1142,16 @@ class WPClient:
             True if successful
         """
         args = [str(comment_id)]
-        
+
         for key, value in kwargs.items():
             escaped_value = str(value).replace("'", "'\\''")
             args.append(f"--{key}='{escaped_value}'")
-        
+
         cmd = f"comment update {' '.join(args)}"
         self._execute_wp(cmd)
         logger.info(f"Updated comment {comment_id}")
         return True
-    
+
     def delete_comment(self, comment_id: int, force: bool = False) -> bool:
         """
         Delete a comment
@@ -1163,15 +1164,15 @@ class WPClient:
             True if successful
         """
         args = [str(comment_id)]
-        
+
         if force:
             args.append("--force")
-        
+
         cmd = f"comment delete {' '.join(args)}"
         self._execute_wp(cmd)
         logger.info(f"Deleted comment {comment_id}")
         return True
-    
+
     def approve_comment(self, comment_id: int) -> bool:
         """
         Approve a comment
@@ -1186,7 +1187,7 @@ class WPClient:
         self._execute_wp(cmd)
         logger.info(f"Approved comment {comment_id}")
         return True
-    
+
     def list_posts(
         self,
         post_type: str = 'post',
@@ -1203,15 +1204,15 @@ class WPClient:
             List of post dictionaries
         """
         args = [f"--post_type={post_type}", "--format=json"]
-        
+
         for key, value in filters.items():
             args.append(f"--{key}={value}")
-        
+
         cmd = f"post list {' '.join(args)}"
         result = self._execute_wp(cmd)
-        
+
         return json.loads(result)
-    
+
     def db_query(self, query: str) -> str:
         """
         Execute database query
@@ -1225,9 +1226,9 @@ class WPClient:
         # Escape query for shell
         escaped_query = query.replace('"', '\\"').replace('$', '\\$')
         cmd = f'db query "{escaped_query}" --format=json'
-        
+
         return self._execute_wp(cmd)
-    
+
     def search_replace(
         self,
         old: str,
@@ -1248,15 +1249,15 @@ class WPClient:
             Command output
         """
         cmd = f"search-replace '{old}' '{new}'"
-        
+
         if tables:
             cmd += f" {' '.join(tables)}"
-        
+
         if dry_run:
             cmd += " --dry-run"
-        
+
         return self._execute_wp(cmd)
-    
+
     def set_post_categories(self, post_id: int, category_ids: List[int]) -> bool:
         """
         Set post categories (replace all existing)
@@ -1271,11 +1272,11 @@ class WPClient:
         if not category_ids:
             logger.warning("No category IDs provided")
             return False
-        
+
         # Join category IDs with comma
         cat_ids_str = ','.join(map(str, category_ids))
         cmd = f"post update {post_id} --post_category={cat_ids_str}"
-        
+
         try:
             self._execute_wp(cmd)
             logger.info(f"Set categories {cat_ids_str} for post {post_id}")
@@ -1289,9 +1290,9 @@ class WPClient:
                     return True
             # Re-raise if it's a real error
             raise
-        
+
         return True
-    
+
     def add_post_category(self, post_id: int, category_id: int) -> bool:
         """
         Add a category to post (append)
@@ -1304,12 +1305,12 @@ class WPClient:
             True if successful
         """
         cmd = f"post term add {post_id} category {category_id}"
-        
+
         self._execute_wp(cmd)
         logger.info(f"Added category {category_id} to post {post_id}")
-        
+
         return True
-    
+
     def remove_post_category(self, post_id: int, category_id: int) -> bool:
         """
         Remove a category from post
@@ -1322,12 +1323,12 @@ class WPClient:
             True if successful
         """
         cmd = f"post term remove {post_id} category {category_id}"
-        
+
         self._execute_wp(cmd)
         logger.info(f"Removed category {category_id} from post {post_id}")
-        
+
         return True
-    
+
     def list_categories(self, search: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         List all categories
@@ -1339,17 +1340,17 @@ class WPClient:
             List of category dictionaries
         """
         cmd = "term list category --format=json --fields=term_id,name,slug,parent,count"
-        
+
         if search:
             escaped_search = search.replace('"', '\\"')
             cmd += f' --search="{escaped_search}"'
-        
+
         result = self._execute_wp(cmd)
         categories = json.loads(result)
-        
+
         logger.debug(f"Found {len(categories)} categories")
         return categories
-    
+
     def get_post_categories(self, post_id: int) -> List[Dict[str, Any]]:
         """
         Get categories for a specific post
@@ -1361,13 +1362,13 @@ class WPClient:
             List of category dictionaries
         """
         cmd = f"post term list {post_id} category --format=json --fields=term_id,name,slug,parent"
-        
+
         result = self._execute_wp(cmd)
         categories = json.loads(result)
-        
+
         logger.debug(f"Post {post_id} has {len(categories)} categories")
         return categories
-    
+
     def get_category_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """
         Get category by name or slug
@@ -1383,21 +1384,21 @@ class WPClient:
             cmd = f"term get category '{name}' --format=json --fields=term_id,name,slug,parent"
             result = self._execute_wp(cmd)
             category = json.loads(result)
-            
+
             logger.debug(f"Found category: {category}")
             return category
         except WPCLIError:
             # If not found by slug, search by name
             categories = self.list_categories(search=name)
-            
+
             # Find exact match (case-insensitive)
             for cat in categories:
                 if cat['name'].lower() == name.lower() or cat['slug'].lower() == name.lower():
                     return cat
-            
+
             logger.warning(f"Category '{name}' not found")
             return None
-    
+
     def get_category_by_id(self, category_id: int) -> Optional[Dict[str, Any]]:
         """
         Get category by ID
@@ -1412,13 +1413,13 @@ class WPClient:
             cmd = f"term get category {category_id} --format=json --fields=term_id,name,slug,parent"
             result = self._execute_wp(cmd)
             category = json.loads(result)
-            
+
             logger.debug(f"Found category: {category}")
             return category
         except WPCLIError:
             logger.warning(f"Category ID {category_id} not found")
             return None
-    
+
     def get_config_param(self, param: str) -> Optional[str]:
         """
         Get WordPress configuration parameter
@@ -1433,13 +1434,13 @@ class WPClient:
             cmd = f"config get {param}"
             result = self._execute_wp(cmd)
             value = result.strip()
-            
+
             logger.debug(f"Retrieved config {param}: {value}")
             return value if value else None
         except WPCLIError:
             logger.warning(f"Config parameter '{param}' not found")
             return None
-    
+
     def set_config_param(self, param: str, value: str) -> bool:
         """
         Set WordPress configuration parameter
@@ -1456,13 +1457,13 @@ class WPClient:
             escaped_value = value.replace("'", "'\\''")
             cmd = f"config set {param} '{escaped_value}'"
             self._execute_wp(cmd)
-            
+
             logger.info(f"Set config {param} = {value}")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to set config {param}: {e}")
             return False
-    
+
     def get_all_config(self) -> Dict[str, str]:
         """
         Get all WordPress configuration parameters
@@ -1474,13 +1475,13 @@ class WPClient:
             cmd = "config list --format=json"
             result = self._execute_wp(cmd)
             config_data = json.loads(result)
-            
+
             logger.debug(f"Retrieved {len(config_data)} config parameters")
             return config_data
         except WPCLIError as e:
             logger.error(f"Failed to get all config: {e}")
             return {}
-    
+
     def create_config(self, params: Dict[str, str], force: bool = False) -> bool:
         """
         Create WordPress wp-config.php file
@@ -1495,10 +1496,10 @@ class WPClient:
         try:
             # Build config creation command
             cmd_parts = ["config create"]
-            
+
             if force:
                 cmd_parts.append("--force")
-            
+
             # Add parameters
             for key, value in params.items():
                 if key.startswith('$'):
@@ -1508,16 +1509,16 @@ class WPClient:
                 else:
                     escaped_value = value.replace("'", "'\\''")
                     cmd_parts.append(f"--{key}='{escaped_value}'")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info("Created wp-config.php successfully")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to create config: {e}")
             return False
-    
+
     def get_config_path(self) -> Optional[str]:
         """
         Get WordPress configuration file path
@@ -1529,13 +1530,13 @@ class WPClient:
             cmd = "config path"
             result = self._execute_wp(cmd)
             path = result.strip()
-            
+
             logger.debug(f"Config path: {path}")
             return path if path else None
         except WPCLIError:
             logger.warning("Could not get config path")
             return None
-    
+
     def get_core_version(self) -> Optional[str]:
         """
         Get WordPress core version
@@ -1547,13 +1548,13 @@ class WPClient:
             cmd = "core version"
             result = self._execute_wp(cmd)
             version = result.strip()
-            
+
             logger.debug(f"WordPress version: {version}")
             return version if version else None
         except WPCLIError:
             logger.warning("Could not get WordPress version")
             return None
-    
+
     def update_core(self, version: Optional[str] = None, force: bool = False) -> bool:
         """
         Update WordPress core
@@ -1567,22 +1568,22 @@ class WPClient:
         """
         try:
             cmd_parts = ["core", "update"]
-            
+
             if version:
                 cmd_parts.append(f"--version={version}")
-            
+
             if force:
                 cmd_parts.append("--force")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Updated WordPress core to version {version or 'latest'}")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to update WordPress core: {e}")
             return False
-    
+
     def download_core(self, version: Optional[str] = None, path: Optional[str] = None) -> Optional[str]:
         """
         Download WordPress core
@@ -1596,16 +1597,16 @@ class WPClient:
         """
         try:
             cmd_parts = ["core", "download"]
-            
+
             if version:
                 cmd_parts.append(f"--version={version}")
-            
+
             if path:
                 cmd_parts.append(f"--path={path}")
-            
+
             cmd = " ".join(cmd_parts)
             result = self._execute_wp(cmd)
-            
+
             # Extract download path from result
             download_path = result.strip()
             logger.info(f"Downloaded WordPress core to {download_path}")
@@ -1613,7 +1614,7 @@ class WPClient:
         except WPCLIError as e:
             logger.error(f"Failed to download WordPress core: {e}")
             return None
-    
+
     def install_core(self, version: Optional[str] = None, force: bool = False) -> bool:
         """
         Install WordPress core
@@ -1627,22 +1628,22 @@ class WPClient:
         """
         try:
             cmd_parts = ["core", "install"]
-            
+
             if version:
                 cmd_parts.append(f"--version={version}")
-            
+
             if force:
                 cmd_parts.append("--force")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Installed WordPress core version {version or 'latest'}")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to install WordPress core: {e}")
             return False
-    
+
     def verify_core(self) -> bool:
         """
         Verify WordPress core files
@@ -1653,13 +1654,13 @@ class WPClient:
         try:
             cmd = "core verify-checksums"
             self._execute_wp(cmd)
-            
+
             logger.info("WordPress core files are valid")
             return True
         except WPCLIError as e:
             logger.error(f"WordPress core files are invalid: {e}")
             return False
-    
+
     def check_core_update(self) -> Optional[Dict[str, Any]]:
         """
         Check for WordPress core updates
@@ -1670,7 +1671,7 @@ class WPClient:
         try:
             cmd = "core check-update --format=json"
             result = self._execute_wp(cmd)
-            
+
             if result.strip():
                 update_info = json.loads(result)
                 logger.debug(f"Core update info: {update_info}")
@@ -1681,7 +1682,7 @@ class WPClient:
         except WPCLIError as e:
             logger.error(f"Failed to check core updates: {e}")
             return None
-    
+
     def list_cron_events(self) -> List[Dict[str, Any]]:
         """
         List WordPress cron events
@@ -1693,13 +1694,13 @@ class WPClient:
             cmd = "cron event list --format=json"
             result = self._execute_wp(cmd)
             events = json.loads(result)
-            
+
             logger.debug(f"Retrieved {len(events)} cron events")
             return events
         except WPCLIError as e:
             logger.error(f"Failed to list cron events: {e}")
             return []
-    
+
     def run_cron(self) -> bool:
         """
         Run WordPress cron events
@@ -1710,13 +1711,13 @@ class WPClient:
         try:
             cmd = "cron event run --due-now"
             self._execute_wp(cmd)
-            
+
             logger.info("Executed cron events")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to run cron events: {e}")
             return False
-    
+
     def schedule_cron_event(self, hook: str, recurrence: str, time: Optional[str] = None, args: Optional[str] = None) -> bool:
         """
         Schedule a WordPress cron event
@@ -1732,22 +1733,22 @@ class WPClient:
         """
         try:
             cmd_parts = ["cron", "event", "schedule", hook, f"--recurrence={recurrence}"]
-            
+
             if time:
                 cmd_parts.append(f"--time={time}")
-            
+
             if args:
                 cmd_parts.append(f"--args={args}")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Scheduled cron event '{hook}' with recurrence '{recurrence}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to schedule cron event: {e}")
             return False
-    
+
     def delete_cron_event(self, hook: str) -> bool:
         """
         Delete a WordPress cron event
@@ -1761,13 +1762,13 @@ class WPClient:
         try:
             cmd = f"cron event delete {hook}"
             self._execute_wp(cmd)
-            
+
             logger.info(f"Deleted cron event '{hook}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to delete cron event: {e}")
             return False
-    
+
     def test_cron(self) -> bool:
         """
         Test WordPress cron system
@@ -1778,7 +1779,7 @@ class WPClient:
         try:
             cmd = "cron test"
             result = self._execute_wp(cmd)
-            
+
             # Check if cron is working
             if "SUCCESS" in result or "working" in result.lower():
                 logger.info("WordPress cron system is working")
@@ -1789,7 +1790,7 @@ class WPClient:
         except WPCLIError as e:
             logger.error(f"Failed to test cron system: {e}")
             return False
-    
+
     def list_taxonomies(self) -> List[Dict[str, Any]]:
         """
         List WordPress taxonomies
@@ -1801,13 +1802,13 @@ class WPClient:
             cmd = "taxonomy list --format=json"
             result = self._execute_wp(cmd)
             taxonomies = json.loads(result)
-            
+
             logger.debug(f"Retrieved {len(taxonomies)} taxonomies")
             return taxonomies
         except WPCLIError as e:
             logger.error(f"Failed to list taxonomies: {e}")
             return []
-    
+
     def get_taxonomy(self, taxonomy: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress taxonomy information
@@ -1822,13 +1823,13 @@ class WPClient:
             cmd = f"taxonomy get {taxonomy} --format=json"
             result = self._execute_wp(cmd)
             taxonomy_info = json.loads(result)
-            
+
             logger.debug(f"Retrieved taxonomy info for {taxonomy}")
             return taxonomy_info
         except WPCLIError:
             logger.warning(f"Taxonomy '{taxonomy}' not found")
             return None
-    
+
     def list_terms(self, taxonomy: str) -> List[Dict[str, Any]]:
         """
         List WordPress taxonomy terms
@@ -1843,13 +1844,13 @@ class WPClient:
             cmd = f"term list {taxonomy} --format=json"
             result = self._execute_wp(cmd)
             terms = json.loads(result)
-            
+
             logger.debug(f"Retrieved {len(terms)} terms for {taxonomy}")
             return terms
         except WPCLIError as e:
             logger.error(f"Failed to list terms for {taxonomy}: {e}")
             return []
-    
+
     def get_term(self, taxonomy: str, term_id: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress taxonomy term information
@@ -1865,14 +1866,14 @@ class WPClient:
             cmd = f"term get {taxonomy} {term_id} --format=json"
             result = self._execute_wp(cmd)
             term_info = json.loads(result)
-            
+
             logger.debug(f"Retrieved term info for {term_id} in {taxonomy}")
             return term_info
         except WPCLIError:
             logger.warning(f"Term '{term_id}' not found in taxonomy '{taxonomy}'")
             return None
-    
-    def create_term(self, taxonomy: str, name: str, slug: Optional[str] = None, 
+
+    def create_term(self, taxonomy: str, name: str, slug: Optional[str] = None,
                    parent: Optional[str] = None, description: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         Create a WordPress taxonomy term
@@ -1889,22 +1890,22 @@ class WPClient:
         """
         try:
             cmd_parts = ["term", "create", taxonomy, f"'{name}'"]
-            
+
             if slug:
                 cmd_parts.append(f"--slug='{slug}'")
-            
+
             if parent:
                 cmd_parts.append(f"--parent={parent}")
-            
+
             if description:
                 escaped_desc = description.replace("'", "'\\''")
                 cmd_parts.append(f"--description='{escaped_desc}'")
-            
+
             cmd_parts.append("--porcelain")
             cmd = " ".join(cmd_parts)
             result = self._execute_wp(cmd)
             term_id = result.strip()
-            
+
             # Get the created term info
             term_info = self.get_term(taxonomy, term_id)
             logger.info(f"Created term '{name}' in taxonomy '{taxonomy}'")
@@ -1912,7 +1913,7 @@ class WPClient:
         except WPCLIError as e:
             logger.error(f"Failed to create term: {e}")
             return None
-    
+
     def delete_term(self, taxonomy: str, term_id: str) -> bool:
         """
         Delete a WordPress taxonomy term
@@ -1927,13 +1928,13 @@ class WPClient:
         try:
             cmd = f"term delete {taxonomy} {term_id}"
             self._execute_wp(cmd)
-            
+
             logger.info(f"Deleted term '{term_id}' from taxonomy '{taxonomy}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to delete term: {e}")
             return False
-    
+
     def list_widgets(self) -> List[Dict[str, Any]]:
         """
         List WordPress widgets
@@ -1945,13 +1946,13 @@ class WPClient:
             cmd = "widget list --format=json"
             result = self._execute_wp(cmd)
             widgets = json.loads(result)
-            
+
             logger.debug(f"Retrieved {len(widgets)} widgets")
             return widgets
         except WPCLIError as e:
             logger.error(f"Failed to list widgets: {e}")
             return []
-    
+
     def get_widget(self, widget_id: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress widget information
@@ -1966,13 +1967,13 @@ class WPClient:
             cmd = f"widget get {widget_id} --format=json"
             result = self._execute_wp(cmd)
             widget_info = json.loads(result)
-            
+
             logger.debug(f"Retrieved widget info for {widget_id}")
             return widget_info
         except WPCLIError:
             logger.warning(f"Widget '{widget_id}' not found")
             return None
-    
+
     def update_widget(self, widget_id: str, options: Dict[str, str]) -> bool:
         """
         Update a WordPress widget
@@ -1986,15 +1987,15 @@ class WPClient:
         """
         try:
             cmd_parts = ["widget", "update", widget_id]
-            
+
             # Add options
             for key, value in options.items():
                 escaped_value = str(value).replace("'", "'\\''")
                 cmd_parts.append(f"--{key}='{escaped_value}'")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Updated widget '{widget_id}' with options: {list(options.keys())}")
             return True
         except WPCLIError as e:

@@ -1,12 +1,13 @@
 """WordPress term management commands"""
 
 import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -47,7 +48,7 @@ def list_terms(taxonomy, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         terms = client.list_terms(taxonomy)
-        
+
         if not terms:
             console.print(f"[yellow]No terms found for taxonomy '{taxonomy}'[/yellow]")
             return
@@ -100,9 +101,9 @@ def get_term(taxonomy, term_id, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         term_info = client.get_term(taxonomy, term_id)
-        
+
         if term_info:
-            console.print(f"[green]Term Information:[/green]")
+            console.print("[green]Term Information:[/green]")
             console.print(f"[cyan]ID:[/cyan] {term_info.get('term_id', 'N/A')}")
             console.print(f"[cyan]Name:[/cyan] {term_info.get('name', 'N/A')}")
             console.print(f"[cyan]Slug:[/cyan] {term_info.get('slug', 'N/A')}")
@@ -153,7 +154,7 @@ def create_term(taxonomy, name, slug, parent, description, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         term_info = client.create_term(taxonomy, name, slug, parent, description)
-        
+
         if term_info:
             console.print(f"[green]Successfully created term '{name}'[/green]")
             console.print(f"[cyan]ID:[/cyan] {term_info.get('term_id', 'N/A')}")
@@ -195,7 +196,7 @@ def delete_term(taxonomy, term_id, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.delete_term(taxonomy, term_id)
-        
+
         if success:
             console.print(f"[green]Successfully deleted term '{term_id}' from '{taxonomy}'[/green]")
         else:

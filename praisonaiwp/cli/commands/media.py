@@ -1,14 +1,16 @@
 """Media command - Upload and manage WordPress media"""
 
-import os
-import click
 import json
+import os
+
+import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -75,14 +77,14 @@ def upload_media(file_path, post_id, title, caption, alt, desc, server):
                 # Upload local file to remote server first
                 filename = os.path.basename(local_path)
                 remote_file_path = f"/tmp/{filename}"
-                console.print(f"[yellow]Uploading local file to server...[/yellow]")
+                console.print("[yellow]Uploading local file to server...[/yellow]")
                 ssh.upload_file(local_path, remote_file_path)
                 console.print(f"[green]✓ File uploaded to {remote_file_path}[/green]")
             elif is_url:
-                console.print(f"[yellow]Importing from URL...[/yellow]")
+                console.print("[yellow]Importing from URL...[/yellow]")
             else:
                 # Assume it's a path on the remote server
-                console.print(f"[yellow]Importing from remote path...[/yellow]")
+                console.print("[yellow]Importing from remote path...[/yellow]")
 
             # Build kwargs for import_media
             kwargs = {}
@@ -137,28 +139,28 @@ def get_media(attachment_id, field, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             result = wp.get_media_info(attachment_id, field=field)
-            
+
             if field:
                 console.print(result)
             else:
                 console.print_json(json.dumps(result, indent=2))
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Get media failed: {e}")
@@ -180,24 +182,24 @@ def get_url(attachment_id, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             url = wp.get_media_url(attachment_id)
             console.print(url)
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"Get media URL failed: {e}")
@@ -226,38 +228,38 @@ def list_media(post_id, mime_type, server):
     try:
         config = Config()
         server_config = config.get_server(server)
-        
+
         with SSHManager(
             server_config['hostname'],
             server_config['username'],
             server_config.get('key_filename'),
             server_config.get('port', 22)
         ) as ssh:
-            
+
             wp = WPClient(
                 ssh,
                 server_config['wp_path'],
                 server_config.get('php_bin', 'php'),
                 server_config.get('wp_cli', '/usr/local/bin/wp')
             )
-            
+
             filters = {}
             if mime_type:
                 filters['post_mime_type'] = mime_type
-            
+
             attachments = wp.list_media(post_id=post_id, **filters)
-            
+
             if not attachments:
                 console.print("[yellow]No attachments found[/yellow]")
                 return
-            
+
             # Create table
             table = Table(title="Media Attachments")
             table.add_column("ID", style="cyan")
             table.add_column("Title", style="green")
             table.add_column("Type", style="yellow")
             table.add_column("URL", style="blue")
-            
+
             for att in attachments:
                 table.add_row(
                     str(att.get('ID', '')),
@@ -265,10 +267,10 @@ def list_media(post_id, mime_type, server):
                     att.get('post_mime_type', ''),
                     att.get('guid', '')
                 )
-            
+
             console.print(table)
             console.print(f"\n[dim]Total: {len(attachments)} attachment(s)[/dim]")
-                
+
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         logger.error(f"List media failed: {e}")

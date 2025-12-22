@@ -1,7 +1,8 @@
 """Simplified tests for AI CLI commands"""
+from unittest.mock import Mock, patch
+
 import pytest
 from click.testing import CliRunner
-from unittest.mock import Mock, patch
 
 from praisonaiwp.cli.commands.ai_commands import ai
 

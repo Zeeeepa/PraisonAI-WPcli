@@ -1,5 +1,6 @@
 """Tests for AI utilities"""
 import time
+
 import pytest
 
 from praisonaiwp.ai.utils.cost_tracker import CostTracker

@@ -1,32 +1,33 @@
 """Main CLI entry point for PraisonAIWP"""
 
 import click
+
 from praisonaiwp.__version__ import __version__
-from praisonaiwp.cli.commands.init import init_command
-from praisonaiwp.cli.commands.create import create_command
-from praisonaiwp.cli.commands.update import update_command
-from praisonaiwp.cli.commands.find import find_command
-from praisonaiwp.cli.commands.list import list_command
 from praisonaiwp.cli.commands.category import category_command
-from praisonaiwp.cli.commands.media import media_command
-from praisonaiwp.cli.commands.plugin import plugin
-from praisonaiwp.cli.commands.install_wp_cli import install_wp_cli
-from praisonaiwp.cli.commands.find_wordpress import find_wordpress
-from praisonaiwp.cli.commands.user import user_command
-from praisonaiwp.cli.commands.option import option_command
-from praisonaiwp.cli.commands.meta import meta_command
 from praisonaiwp.cli.commands.comment import comment_command
-from praisonaiwp.cli.commands.system import system_command
-from praisonaiwp.cli.commands.theme import theme_command
-from praisonaiwp.cli.commands.menu import menu_command
-from praisonaiwp.cli.commands.transient import transient_command
-from praisonaiwp.cli.commands.post import post_command
-from praisonaiwp.cli.commands.db import db_command
 from praisonaiwp.cli.commands.config import config_command
 from praisonaiwp.cli.commands.core import core_command
+from praisonaiwp.cli.commands.create import create_command
 from praisonaiwp.cli.commands.cron import cron_command
+from praisonaiwp.cli.commands.db import db_command
+from praisonaiwp.cli.commands.find import find_command
+from praisonaiwp.cli.commands.find_wordpress import find_wordpress
+from praisonaiwp.cli.commands.init import init_command
+from praisonaiwp.cli.commands.install_wp_cli import install_wp_cli
+from praisonaiwp.cli.commands.list import list_command
+from praisonaiwp.cli.commands.media import media_command
+from praisonaiwp.cli.commands.menu import menu_command
+from praisonaiwp.cli.commands.meta import meta_command
+from praisonaiwp.cli.commands.option import option_command
+from praisonaiwp.cli.commands.plugin import plugin
+from praisonaiwp.cli.commands.post import post_command
+from praisonaiwp.cli.commands.system import system_command
 from praisonaiwp.cli.commands.taxonomy import taxonomy_command
 from praisonaiwp.cli.commands.term import term_command
+from praisonaiwp.cli.commands.theme import theme_command
+from praisonaiwp.cli.commands.transient import transient_command
+from praisonaiwp.cli.commands.update import update_command
+from praisonaiwp.cli.commands.user import user_command
 from praisonaiwp.cli.commands.widget import widget_command
 
 # Try to import AI commands (optional)
@@ -49,83 +50,83 @@ except ImportError:
 def cli():
     """
     PraisonAIWP - AI-powered WordPress content management
-    
+
     Simple, powerful WordPress automation via WP-CLI over SSH.
-    
+
     \b
     PREFERRED CONTENT STRUCTURE:
     ----------------------------
     WordPress-based HTML structure is preferred for best compatibility.
-    
+
     \b
     CONTENT FORMAT:
     ---------------
     Content should be HTML. By default, it auto-converts to Gutenberg blocks.
     Use --no-block-conversion to send raw Gutenberg block markup directly.
-    
+
     \b
     GUTENBERG BLOCK FORMAT (use with --no-block-conversion):
     --------------------------------------------------------
-    
+
     \b
     Paragraph:
         <!-- wp:paragraph -->
         <p>Your text here</p>
         <!-- /wp:paragraph -->
-    
+
     \b
     Heading (h2, h3, h4):
         <!-- wp:heading -->
         <h2 class="wp-block-heading">Title</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:heading {"level":3} -->
         <h3 class="wp-block-heading">Subtitle</h3>
         <!-- /wp:heading -->
-    
+
     \b
     Code block:
         <!-- wp:code -->
         <pre class="wp-block-code"><code>your code here</code></pre>
         <!-- /wp:code -->
-    
+
     \b
     Table:
         <!-- wp:table -->
         <figure class="wp-block-table"><table><thead><tr><th>Header</th></tr></thead>
         <tbody><tr><td>Cell</td></tr></tbody></table></figure>
         <!-- /wp:table -->
-    
+
     \b
     Separator:
         <!-- wp:separator -->
         <hr class="wp-block-separator has-alpha-channel-opacity"/>
         <!-- /wp:separator -->
-    
+
     \b
     List (unordered):
         <!-- wp:list -->
         <ul class="wp-block-list"><li>Item 1</li><li>Item 2</li></ul>
         <!-- /wp:list -->
-    
+
     \b
     List (ordered):
         <!-- wp:list {"ordered":true} -->
         <ol class="wp-block-list"><li>First</li><li>Second</li></ol>
         <!-- /wp:list -->
-    
+
     \b
     Image:
         <!-- wp:image {"id":123} -->
         <figure class="wp-block-image"><img src="URL" alt="Alt text"/></figure>
         <!-- /wp:image -->
-    
+
     \b
     Quote:
         <!-- wp:quote -->
         <blockquote class="wp-block-quote"><p>Quote text</p><cite>Author</cite></blockquote>
         <!-- /wp:quote -->
-    
+
     \b
     Columns (2 columns):
         <!-- wp:columns -->
@@ -138,7 +139,7 @@ def cli():
         <!-- /wp:column -->
         </div>
         <!-- /wp:columns -->
-    
+
     \b
     Button:
         <!-- wp:buttons -->
@@ -148,25 +149,25 @@ def cli():
         <!-- /wp:button -->
         </div>
         <!-- /wp:buttons -->
-    
+
     \b
     OTHER BLOCKS (same pattern <!-- wp:NAME -->...<!-- /wp:NAME -->):
     preformatted, pullquote, verse, audio, video, file, gallery, cover,
     media-text, group, spacer, embed, html, shortcode, details
-    
+
     \b
     EXAMPLES:
     ---------
-    
+
         # Create post with HTML (auto-converts to blocks)
         praisonaiwp create "My Post" --content "<h2>Title</h2><p>Content</p>"
-        
+
         # Create post with raw Gutenberg blocks
         praisonaiwp create "My Post" --no-block-conversion --content "<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->"
-        
+
         # Update post content
         praisonaiwp update 123 --post-content "<p>New content</p>"
-        
+
         # List posts
         praisonaiwp list --type page
     """

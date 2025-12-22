@@ -1,8 +1,8 @@
 """Tests for AI CLI commands"""
+from unittest.mock import Mock, patch
+
 import pytest
 from click.testing import CliRunner
-from unittest.mock import Mock, patch
-import os
 
 # Check if AI features are available
 try:

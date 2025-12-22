@@ -1,13 +1,14 @@
 """Tests for AI validators and utilities"""
 import os
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
 
 from praisonaiwp.ai.utils.validators import (
     APIKeyValidator,
     ContentValidator,
     validate_api_key,
-    validate_content
+    validate_content,
 )
 
 

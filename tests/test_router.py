@@ -1,6 +1,5 @@
 """Tests for ServerRouter - automatic server routing based on website URLs"""
 
-import yaml
 from praisonaiwp.core.router import ServerRouter
 
 

@@ -1,12 +1,13 @@
 """WordPress cron management commands"""
 
 import click
+from rich.console import Console
+from rich.table import Table
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
-from rich.table import Table
 
 console = Console()
 logger = get_logger(__name__)
@@ -43,7 +44,7 @@ def list_cron(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         events = client.list_cron_events()
-        
+
         if not events:
             console.print("[yellow]No cron events found[/yellow]")
             return
@@ -94,7 +95,7 @@ def run_cron(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.run_cron()
-        
+
         if success:
             console.print("[green]Cron events executed successfully[/green]")
         else:
@@ -145,7 +146,7 @@ def schedule_cron_event(hook, recurrence, time, args, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.schedule_cron_event(hook, recurrence, time, args)
-        
+
         if success:
             time_info = f" at {time}" if time else ""
             args_info = f" with args {args}" if args else ""
@@ -186,7 +187,7 @@ def delete_cron_event(hook, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.delete_cron_event(hook)
-        
+
         if success:
             console.print(f"[green]Successfully deleted cron event '{hook}'[/green]")
         else:
@@ -224,7 +225,7 @@ def test_cron(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         is_working = client.test_cron()
-        
+
         if is_working:
             console.print("[green]WordPress cron system is working properly[/green]")
         else:

@@ -1,7 +1,8 @@
 """Server routing for automatic server selection based on website URLs"""
 
-from typing import Dict, Any, Tuple, Optional
+from typing import Any, Dict, Optional, Tuple
 from urllib.parse import urlparse
+
 from praisonaiwp.utils.logger import get_logger
 
 logger = get_logger(__name__)

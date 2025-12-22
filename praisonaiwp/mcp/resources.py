@@ -5,8 +5,7 @@ Resources provide read-only data to LLMs for context.
 They are similar to GET endpoints - they provide data but don't perform actions.
 """
 
-import json
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 def get_wp_client():

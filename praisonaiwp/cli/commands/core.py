@@ -1,11 +1,12 @@
 """WordPress core management commands"""
 
 import click
+from rich.console import Console
+
 from praisonaiwp.core.config import Config
 from praisonaiwp.core.ssh_manager import SSHManager
 from praisonaiwp.core.wp_client import WPClient
 from praisonaiwp.utils.logger import get_logger
-from rich.console import Console
 
 console = Console()
 logger = get_logger(__name__)
@@ -42,7 +43,7 @@ def get_core_version(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         version = client.get_core_version()
-        
+
         if version:
             console.print(f"[green]WordPress version:[/green] {version}")
         else:
@@ -87,7 +88,7 @@ def update_core(version, force, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.update_core(version=version, force=force)
-        
+
         if success:
             if version:
                 console.print(f"[green]Successfully updated WordPress to version {version}[/green]")
@@ -136,7 +137,7 @@ def download_core(version, path, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         download_path = client.download_core(version=version, path=path)
-        
+
         if download_path:
             version_info = f" version {version}" if version else " latest version"
             console.print(f"[green]Successfully downloaded WordPress{version_info} to {download_path}[/green]")
@@ -183,7 +184,7 @@ def install_core(version, force, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.install_core(version=version, force=force)
-        
+
         if success:
             if version:
                 console.print(f"[green]Successfully installed WordPress version {version}[/green]")
@@ -227,7 +228,7 @@ def verify_core(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         is_valid = client.verify_core()
-        
+
         if is_valid:
             console.print("[green]WordPress core files are valid[/green]")
         else:
@@ -266,7 +267,7 @@ def check_core_update(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         update_info = client.check_core_update()
-        
+
         if update_info:
             if 'version' in update_info:
                 console.print(f"[green]Update available:[/green] {update_info['version']}")

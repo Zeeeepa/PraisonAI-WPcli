@@ -1,7 +1,8 @@
 """Pytest configuration and fixtures"""
 
+
 import pytest
-from pathlib import Path
+
 from praisonaiwp.core.config import Config
 
 
@@ -57,7 +58,7 @@ def sample_post_content():
 def sample_posts_json(tmp_path):
     """Create sample posts JSON file"""
     import json
-    
+
     posts = [
         {
             "title": "Test Post 1",
@@ -70,9 +71,9 @@ def sample_posts_json(tmp_path):
             "status": "draft"
         }
     ]
-    
+
     file_path = tmp_path / "posts.json"
     with open(file_path, 'w') as f:
         json.dump(posts, f)
-    
+
     return file_path
