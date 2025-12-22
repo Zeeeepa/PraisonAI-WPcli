@@ -50,7 +50,7 @@ def scaffold_post_type(slug, label, public, has_archive, supports, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.scaffold_post_type(slug, label, public, has_archive, supports)
-        
+
         if success:
             console.print(f"[green]Successfully generated post type '{slug}'[/green]")
             if label:
@@ -104,7 +104,7 @@ def scaffold_taxonomy(slug, label, public, hierarchical, post_types, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.scaffold_taxonomy(slug, label, public, hierarchical, post_types)
-        
+
         if success:
             console.print(f"[green]Successfully generated taxonomy '{slug}'[/green]")
             if label:
@@ -157,7 +157,7 @@ def scaffold_plugin(slug, plugin_name, plugin_uri, author, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.scaffold_plugin(slug, plugin_name, plugin_uri, author)
-        
+
         if success:
             console.print(f"[green]Successfully generated plugin '{slug}'[/green]")
             if plugin_name:
@@ -209,7 +209,7 @@ def scaffold_theme(slug, theme_name, theme_uri, author, author_uri, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.scaffold_theme(slug, theme_name, theme_uri, author, author_uri)
-        
+
         if success:
             console.print(f"[green]Successfully generated theme '{slug}'[/green]")
             if theme_name:

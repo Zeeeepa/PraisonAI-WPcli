@@ -23,7 +23,7 @@ class WPClient:
     ):
         """
         Initialize WP Client
-        
+
         Args:
             ssh: SSH Manager instance
             wp_path: WordPress installation path
@@ -45,7 +45,7 @@ class WPClient:
     def _verify_installation(self):
         """
         Verify WP-CLI and WordPress installation
-        
+
         Raises:
             WPCLIError: If WP-CLI or WordPress not found
         """
@@ -108,37 +108,37 @@ class WPClient:
     def wp(self, *args, **kwargs) -> Any:
         """
         Generic WP-CLI command executor - supports ANY WP-CLI command
-        
+
         This method provides direct access to WP-CLI without needing specific wrapper methods.
         Arguments are automatically converted to WP-CLI flags and options.
-        
+
         Args:
             *args: Command parts (e.g., 'post', 'list')
             **kwargs: Command options (converted to --key=value flags)
                      - Use True for boolean flags (e.g., porcelain=True -> --porcelain)
                      - Use format='json' for automatic JSON parsing
                      - Underscores in keys are converted to hyphens (dry_run -> --dry-run)
-        
+
         Returns:
             Command output (string), or parsed JSON if format='json'
-        
+
         Examples:
             # Create a user
             wp('user', 'create', 'john', 'john@example.com', role='editor', porcelain=True)
-            
+
             # List posts
             posts = wp('post', 'list', status='publish', format='json')
-            
+
             # Flush cache
             wp('cache', 'flush')
-            
+
             # Search and replace
             wp('search-replace', 'old', 'new', dry_run=True)
-            
+
             # Plugin operations
             wp('plugin', 'activate', 'akismet')
             wp('plugin', 'list', status='active', format='json')
-        
+
         Raises:
             WPCLIError: If command fails
         """
@@ -180,13 +180,13 @@ class WPClient:
     def _execute_wp(self, command: str) -> str:
         """
         Execute WP-CLI command (internal method)
-        
+
         Args:
             command: WP-CLI command (without 'wp' prefix)
-            
+
         Returns:
             Command output
-            
+
         Raises:
             WPCLIError: If command fails
         """
@@ -232,11 +232,11 @@ class WPClient:
     def get_post(self, post_id: int, field: Optional[str] = None) -> Any:
         """
         Get post data
-        
+
         Args:
             post_id: Post ID
             field: Specific field to retrieve (optional)
-            
+
         Returns:
             Post data (dict if no field specified, str if field specified)
         """
@@ -254,7 +254,7 @@ class WPClient:
     def get_default_user(self) -> Optional[str]:
         """
         Get the default admin user (user with ID 1 or first admin user)
-        
+
         Returns:
             User login name or None if not found
         """
@@ -278,10 +278,10 @@ class WPClient:
     def create_post(self, **kwargs) -> int:
         """
         Create a new post
-        
+
         Args:
             **kwargs: Post fields (post_title, post_content, post_status, etc.)
-            
+
         Returns:
             Created post ID
         """
@@ -309,11 +309,11 @@ class WPClient:
     def update_post(self, post_id: int, **kwargs) -> bool:
         """
         Update an existing post
-        
+
         Args:
             post_id: Post ID to update
             **kwargs: Fields to update
-            
+
         Returns:
             True if successful
         """
@@ -332,11 +332,11 @@ class WPClient:
     def delete_post(self, post_id: int, force: bool = False) -> bool:
         """
         Delete a post
-        
+
         Args:
             post_id: Post ID to delete
             force: Skip trash and force deletion
-            
+
         Returns:
             True if successful
         """
@@ -350,10 +350,10 @@ class WPClient:
     def post_exists(self, post_id: int) -> bool:
         """
         Check if a post exists
-        
+
         Args:
             post_id: Post ID to check
-            
+
         Returns:
             True if post exists, False otherwise
         """
@@ -369,11 +369,11 @@ class WPClient:
     def get_post_meta(self, post_id: int, key: str = None) -> Any:
         """
         Get post meta value(s)
-        
+
         Args:
             post_id: Post ID
             key: Meta key (if None, returns all meta)
-            
+
         Returns:
             Meta value or dict of all meta
         """
@@ -389,12 +389,12 @@ class WPClient:
     def set_post_meta(self, post_id: int, key: str, value: str) -> bool:
         """
         Set post meta value
-        
+
         Args:
             post_id: Post ID
             key: Meta key
             value: Meta value
-            
+
         Returns:
             True if successful
         """
@@ -407,11 +407,11 @@ class WPClient:
     def delete_post_meta(self, post_id: int, key: str) -> bool:
         """
         Delete post meta
-        
+
         Args:
             post_id: Post ID
             key: Meta key
-            
+
         Returns:
             True if successful
         """
@@ -423,12 +423,12 @@ class WPClient:
     def update_post_meta(self, post_id: int, key: str, value: str) -> bool:
         """
         Update post meta value
-        
+
         Args:
             post_id: Post ID
             key: Meta key
             value: Meta value
-            
+
         Returns:
             True if successful
         """
@@ -441,10 +441,10 @@ class WPClient:
     def list_users(self, **filters) -> List[Dict[str, Any]]:
         """
         List users with filters
-        
+
         Args:
             **filters: Filters (role, search, etc.)
-            
+
         Returns:
             List of user dictionaries
         """
@@ -461,10 +461,10 @@ class WPClient:
     def get_user(self, user_id: int) -> Dict[str, Any]:
         """
         Get user details
-        
+
         Args:
             user_id: User ID
-            
+
         Returns:
             User dictionary
         """
@@ -476,12 +476,12 @@ class WPClient:
     def create_user(self, username: str, email: str, **kwargs) -> int:
         """
         Create a new user
-        
+
         Args:
             username: Username
             email: Email address
             **kwargs: Additional user fields (role, user_pass, display_name, etc.)
-            
+
         Returns:
             User ID
         """
@@ -500,11 +500,11 @@ class WPClient:
     def update_user(self, user_id: int, **kwargs) -> bool:
         """
         Update user fields
-        
+
         Args:
             user_id: User ID
             **kwargs: User fields to update
-            
+
         Returns:
             True if successful
         """
@@ -522,11 +522,11 @@ class WPClient:
     def delete_user(self, user_id: int, reassign: int = None) -> bool:
         """
         Delete a user
-        
+
         Args:
             user_id: User ID to delete
             reassign: User ID to reassign posts to (optional)
-            
+
         Returns:
             True if successful
         """
@@ -543,10 +543,10 @@ class WPClient:
     def get_option(self, option_name: str) -> str:
         """
         Get WordPress option value
-        
+
         Args:
             option_name: Option name
-            
+
         Returns:
             Option value
         """
@@ -558,11 +558,11 @@ class WPClient:
     def set_option(self, option_name: str, value: str) -> bool:
         """
         Set WordPress option value
-        
+
         Args:
             option_name: Option name
             value: Option value
-            
+
         Returns:
             True if successful
         """
@@ -575,10 +575,10 @@ class WPClient:
     def delete_option(self, option_name: str) -> bool:
         """
         Delete WordPress option
-        
+
         Args:
             option_name: Option name
-            
+
         Returns:
             True if successful
         """
@@ -590,10 +590,10 @@ class WPClient:
     def list_plugins(self, **filters) -> List[Dict[str, Any]]:
         """
         List installed plugins
-        
+
         Args:
             **filters: Filters (status, etc.)
-            
+
         Returns:
             List of plugin dictionaries
         """
@@ -610,10 +610,10 @@ class WPClient:
     def list_themes(self, **filters) -> List[Dict[str, Any]]:
         """
         List installed themes
-        
+
         Args:
             **filters: Filters (status, etc.)
-            
+
         Returns:
             List of theme dictionaries
         """
@@ -630,10 +630,10 @@ class WPClient:
     def activate_plugin(self, plugin: str) -> bool:
         """
         Activate a plugin
-        
+
         Args:
             plugin: Plugin slug or path
-            
+
         Returns:
             True if successful
         """
@@ -645,10 +645,10 @@ class WPClient:
     def deactivate_plugin(self, plugin: str) -> bool:
         """
         Deactivate a plugin
-        
+
         Args:
             plugin: Plugin slug or path
-            
+
         Returns:
             True if successful
         """
@@ -660,10 +660,10 @@ class WPClient:
     def update_plugin(self, plugin: str = "all") -> bool:
         """
         Update one or all plugins
-        
+
         Args:
             plugin: Plugin slug/path or "all" to update all plugins
-            
+
         Returns:
             True if successful
         """
@@ -678,10 +678,10 @@ class WPClient:
     def activate_theme(self, theme: str) -> bool:
         """
         Activate a theme
-        
+
         Args:
             theme: Theme slug
-            
+
         Returns:
             True if successful
         """
@@ -693,11 +693,11 @@ class WPClient:
     def get_user_meta(self, user_id: int, key: str = None) -> Any:
         """
         Get user meta value(s)
-        
+
         Args:
             user_id: User ID
             key: Meta key (optional, returns all if not specified)
-            
+
         Returns:
             Meta value or list of all meta
         """
@@ -713,12 +713,12 @@ class WPClient:
     def set_user_meta(self, user_id: int, key: str, value: str) -> bool:
         """
         Set user meta value
-        
+
         Args:
             user_id: User ID
             key: Meta key
             value: Meta value
-            
+
         Returns:
             True if successful
         """
@@ -731,12 +731,12 @@ class WPClient:
     def update_user_meta(self, user_id: int, key: str, value: str) -> bool:
         """
         Update user meta value
-        
+
         Args:
             user_id: User ID
             key: Meta key
             value: Meta value
-            
+
         Returns:
             True if successful
         """
@@ -749,11 +749,11 @@ class WPClient:
     def delete_user_meta(self, user_id: int, key: str) -> bool:
         """
         Delete user meta
-        
+
         Args:
             user_id: User ID
             key: Meta key
-            
+
         Returns:
             True if successful
         """
@@ -765,7 +765,7 @@ class WPClient:
     def flush_cache(self) -> bool:
         """
         Flush object cache
-        
+
         Returns:
             True if successful
         """
@@ -777,7 +777,7 @@ class WPClient:
     def get_cache_type(self) -> str:
         """
         Get cache type
-        
+
         Returns:
             Cache type string
         """
@@ -788,10 +788,10 @@ class WPClient:
     def get_transient(self, key: str) -> str:
         """
         Get transient value
-        
+
         Args:
             key: Transient key
-            
+
         Returns:
             Transient value
         """
@@ -802,12 +802,12 @@ class WPClient:
     def set_transient(self, key: str, value: str, expiration: int = None) -> bool:
         """
         Set transient value
-        
+
         Args:
             key: Transient key
             value: Transient value
             expiration: Expiration time in seconds (optional)
-            
+
         Returns:
             True if successful
         """
@@ -822,10 +822,10 @@ class WPClient:
     def delete_transient(self, key: str) -> bool:
         """
         Delete transient
-        
+
         Args:
             key: Transient key
-            
+
         Returns:
             True if successful
         """
@@ -837,7 +837,7 @@ class WPClient:
     def list_menus(self) -> List[Dict[str, Any]]:
         """
         List navigation menus
-        
+
         Returns:
             List of menu dictionaries
         """
@@ -848,10 +848,10 @@ class WPClient:
     def create_menu(self, name: str) -> int:
         """
         Create navigation menu
-        
+
         Args:
             name: Menu name
-            
+
         Returns:
             Menu ID
         """
@@ -864,10 +864,10 @@ class WPClient:
     def delete_menu(self, menu_id: int) -> bool:
         """
         Delete navigation menu
-        
+
         Args:
             menu_id: Menu ID
-            
+
         Returns:
             True if successful
         """
@@ -879,11 +879,11 @@ class WPClient:
     def add_menu_item(self, menu_id: int, **kwargs) -> int:
         """
         Add item to menu
-        
+
         Args:
             menu_id: Menu ID
             **kwargs: Item properties (title, url, object-id, type, etc.)
-            
+
         Returns:
             Menu item ID
         """
@@ -904,12 +904,12 @@ class WPClient:
     def create_term(self, taxonomy: str, name: str, **kwargs) -> int:
         """
         Create a new term
-        
+
         Args:
             taxonomy: Taxonomy name (category, post_tag, etc.)
             name: Term name
             **kwargs: Additional options (slug, description, parent, etc.)
-            
+
         Returns:
             Term ID
         """
@@ -931,11 +931,11 @@ class WPClient:
     def delete_term(self, taxonomy: str, term_id: int) -> bool:
         """
         Delete a term
-        
+
         Args:
             taxonomy: Taxonomy name
             term_id: Term ID
-            
+
         Returns:
             True if successful
         """
@@ -947,12 +947,12 @@ class WPClient:
     def update_term(self, taxonomy: str, term_id: int, **kwargs) -> bool:
         """
         Update a term
-        
+
         Args:
             taxonomy: Taxonomy name
             term_id: Term ID
             **kwargs: Fields to update (name, slug, description, parent, etc.)
-            
+
         Returns:
             True if successful
         """
@@ -972,7 +972,7 @@ class WPClient:
     def get_core_version(self) -> str:
         """
         Get WordPress core version
-        
+
         Returns:
             WordPress version string
         """
@@ -983,7 +983,7 @@ class WPClient:
     def core_is_installed(self) -> bool:
         """
         Check if WordPress is installed
-        
+
         Returns:
             True if WordPress is installed
         """
@@ -997,12 +997,12 @@ class WPClient:
     def import_media(self, file_path: str, post_id: int = None, **kwargs) -> int:
         """
         Import media file to WordPress
-        
+
         Args:
             file_path: Path to media file
             post_id: Post ID to attach to (optional)
             **kwargs: Additional options (title, caption, alt, desc, etc.)
-            
+
         Returns:
             Attachment ID
         """
@@ -1026,11 +1026,11 @@ class WPClient:
     def get_media_info(self, attachment_id: int, field: Optional[str] = None) -> Any:
         """
         Get media/attachment information
-        
+
         Args:
             attachment_id: Attachment ID
             field: Specific field to retrieve (guid, post_title, post_mime_type, etc.)
-            
+
         Returns:
             Attachment data (dict if no field specified, str if field specified)
         """
@@ -1039,10 +1039,10 @@ class WPClient:
     def get_media_url(self, attachment_id: int) -> str:
         """
         Get media URL
-        
+
         Args:
             attachment_id: Attachment ID
-            
+
         Returns:
             Media URL
         """
@@ -1053,11 +1053,11 @@ class WPClient:
     def list_media(self, post_id: int = None, **filters) -> List[Dict[str, Any]]:
         """
         List media/attachments
-        
+
         Args:
             post_id: Filter by parent post ID (optional)
             **filters: Additional filters (mime_type, etc.)
-            
+
         Returns:
             List of attachment dictionaries
         """
@@ -1073,10 +1073,10 @@ class WPClient:
     def list_comments(self, **filters) -> List[Dict[str, Any]]:
         """
         List comments with filters
-        
+
         Args:
             **filters: Filters (status, post_id, etc.)
-            
+
         Returns:
             List of comment dictionaries
         """
@@ -1093,10 +1093,10 @@ class WPClient:
     def get_comment(self, comment_id: int) -> Dict[str, Any]:
         """
         Get comment details
-        
+
         Args:
             comment_id: Comment ID
-            
+
         Returns:
             Comment dictionary
         """
@@ -1108,11 +1108,11 @@ class WPClient:
     def create_comment(self, post_id: int, **kwargs) -> int:
         """
         Create a new comment
-        
+
         Args:
             post_id: Post ID
             **kwargs: Comment fields (comment_content, comment_author, etc.)
-            
+
         Returns:
             Comment ID
         """
@@ -1133,11 +1133,11 @@ class WPClient:
     def update_comment(self, comment_id: int, **kwargs) -> bool:
         """
         Update comment fields
-        
+
         Args:
             comment_id: Comment ID
             **kwargs: Comment fields to update
-            
+
         Returns:
             True if successful
         """
@@ -1155,11 +1155,11 @@ class WPClient:
     def delete_comment(self, comment_id: int, force: bool = False) -> bool:
         """
         Delete a comment
-        
+
         Args:
             comment_id: Comment ID
             force: Bypass trash and force deletion
-            
+
         Returns:
             True if successful
         """
@@ -1176,10 +1176,10 @@ class WPClient:
     def approve_comment(self, comment_id: int) -> bool:
         """
         Approve a comment
-        
+
         Args:
             comment_id: Comment ID
-            
+
         Returns:
             True if successful
         """
@@ -1195,11 +1195,11 @@ class WPClient:
     ) -> List[Dict[str, Any]]:
         """
         List posts with filters
-        
+
         Args:
             post_type: Post type (default: 'post')
             **filters: Additional filters (post_status, etc.)
-            
+
         Returns:
             List of post dictionaries
         """
@@ -1216,10 +1216,10 @@ class WPClient:
     def db_query(self, query: str) -> str:
         """
         Execute database query
-        
+
         Args:
             query: SQL query
-            
+
         Returns:
             Query result as JSON string
         """
@@ -1238,13 +1238,13 @@ class WPClient:
     ) -> str:
         """
         Search and replace in database
-        
+
         Args:
             old: Text to find
             new: Replacement text
             tables: Tables to search (optional)
             dry_run: Preview changes without applying
-            
+
         Returns:
             Command output
         """
@@ -1261,11 +1261,11 @@ class WPClient:
     def set_post_categories(self, post_id: int, category_ids: List[int]) -> bool:
         """
         Set post categories (replace all existing)
-        
+
         Args:
             post_id: Post ID
             category_ids: List of category IDs
-            
+
         Returns:
             True if successful
         """
@@ -1296,11 +1296,11 @@ class WPClient:
     def add_post_category(self, post_id: int, category_id: int) -> bool:
         """
         Add a category to post (append)
-        
+
         Args:
             post_id: Post ID
             category_id: Category ID to add
-            
+
         Returns:
             True if successful
         """
@@ -1314,11 +1314,11 @@ class WPClient:
     def remove_post_category(self, post_id: int, category_id: int) -> bool:
         """
         Remove a category from post
-        
+
         Args:
             post_id: Post ID
             category_id: Category ID to remove
-            
+
         Returns:
             True if successful
         """
@@ -1332,10 +1332,10 @@ class WPClient:
     def list_categories(self, search: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         List all categories
-        
+
         Args:
             search: Optional search query
-            
+
         Returns:
             List of category dictionaries
         """
@@ -1354,10 +1354,10 @@ class WPClient:
     def get_post_categories(self, post_id: int) -> List[Dict[str, Any]]:
         """
         Get categories for a specific post
-        
+
         Args:
             post_id: Post ID
-            
+
         Returns:
             List of category dictionaries
         """
@@ -1372,10 +1372,10 @@ class WPClient:
     def get_category_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """
         Get category by name or slug
-        
+
         Args:
             name: Category name or slug
-            
+
         Returns:
             Category dictionary or None
         """
@@ -1402,10 +1402,10 @@ class WPClient:
     def get_category_by_id(self, category_id: int) -> Optional[Dict[str, Any]]:
         """
         Get category by ID
-        
+
         Args:
             category_id: Category ID
-            
+
         Returns:
             Category dictionary or None
         """
@@ -1423,10 +1423,10 @@ class WPClient:
     def get_config_param(self, param: str) -> Optional[str]:
         """
         Get WordPress configuration parameter
-        
+
         Args:
             param: Configuration parameter name
-            
+
         Returns:
             Parameter value or None
         """
@@ -1444,11 +1444,11 @@ class WPClient:
     def set_config_param(self, param: str, value: str) -> bool:
         """
         Set WordPress configuration parameter
-        
+
         Args:
             param: Configuration parameter name
             value: Parameter value
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1467,7 +1467,7 @@ class WPClient:
     def get_all_config(self) -> Dict[str, str]:
         """
         Get all WordPress configuration parameters
-        
+
         Returns:
             Dictionary of all config parameters
         """
@@ -1485,11 +1485,11 @@ class WPClient:
     def create_config(self, params: Dict[str, str], force: bool = False) -> bool:
         """
         Create WordPress wp-config.php file
-        
+
         Args:
             params: Configuration parameters
             force: Whether to overwrite existing config
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1522,7 +1522,7 @@ class WPClient:
     def get_config_path(self) -> Optional[str]:
         """
         Get WordPress configuration file path
-        
+
         Returns:
             Config file path or None
         """
@@ -1540,7 +1540,7 @@ class WPClient:
     def get_core_version(self) -> Optional[str]:
         """
         Get WordPress core version
-        
+
         Returns:
             WordPress version string or None
         """
@@ -1558,11 +1558,11 @@ class WPClient:
     def update_core(self, version: Optional[str] = None, force: bool = False) -> bool:
         """
         Update WordPress core
-        
+
         Args:
             version: Specific version to update to (None for latest)
             force: Force update even if already up to date
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1587,11 +1587,11 @@ class WPClient:
     def download_core(self, version: Optional[str] = None, path: Optional[str] = None) -> Optional[str]:
         """
         Download WordPress core
-        
+
         Args:
             version: Specific version to download (None for latest)
             path: Download path (None for default)
-            
+
         Returns:
             Download path or None if failed
         """
@@ -1618,11 +1618,11 @@ class WPClient:
     def install_core(self, version: Optional[str] = None, force: bool = False) -> bool:
         """
         Install WordPress core
-        
+
         Args:
             version: Specific version to install (None for latest)
             force: Force installation even if WordPress exists
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1647,7 +1647,7 @@ class WPClient:
     def verify_core(self) -> bool:
         """
         Verify WordPress core files
-        
+
         Returns:
             True if valid, False otherwise
         """
@@ -1664,7 +1664,7 @@ class WPClient:
     def check_core_update(self) -> Optional[Dict[str, Any]]:
         """
         Check for WordPress core updates
-        
+
         Returns:
             Update information dictionary or None
         """
@@ -1686,7 +1686,7 @@ class WPClient:
     def list_cron_events(self) -> List[Dict[str, Any]]:
         """
         List WordPress cron events
-        
+
         Returns:
             List of cron event dictionaries
         """
@@ -1704,7 +1704,7 @@ class WPClient:
     def run_cron(self) -> bool:
         """
         Run WordPress cron events
-        
+
         Returns:
             True if successful, False otherwise
         """
@@ -1721,13 +1721,13 @@ class WPClient:
     def schedule_cron_event(self, hook: str, recurrence: str, time: Optional[str] = None, args: Optional[str] = None) -> bool:
         """
         Schedule a WordPress cron event
-        
+
         Args:
             hook: Hook name
             recurrence: Schedule recurrence
             time: Time for daily/twicedaily schedules
             args: Arguments to pass to hook
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1752,10 +1752,10 @@ class WPClient:
     def delete_cron_event(self, hook: str) -> bool:
         """
         Delete a WordPress cron event
-        
+
         Args:
             hook: Hook name to delete
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1772,7 +1772,7 @@ class WPClient:
     def test_cron(self) -> bool:
         """
         Test WordPress cron system
-        
+
         Returns:
             True if working, False otherwise
         """
@@ -1794,7 +1794,7 @@ class WPClient:
     def list_taxonomies(self) -> List[Dict[str, Any]]:
         """
         List WordPress taxonomies
-        
+
         Returns:
             List of taxonomy dictionaries
         """
@@ -1812,10 +1812,10 @@ class WPClient:
     def get_taxonomy(self, taxonomy: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress taxonomy information
-        
+
         Args:
             taxonomy: Taxonomy name
-            
+
         Returns:
             Taxonomy dictionary or None
         """
@@ -1833,10 +1833,10 @@ class WPClient:
     def list_terms(self, taxonomy: str) -> List[Dict[str, Any]]:
         """
         List WordPress taxonomy terms
-        
+
         Args:
             taxonomy: Taxonomy name
-            
+
         Returns:
             List of term dictionaries
         """
@@ -1854,11 +1854,11 @@ class WPClient:
     def get_term(self, taxonomy: str, term_id: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress taxonomy term information
-        
+
         Args:
             taxonomy: Taxonomy name
             term_id: Term ID
-            
+
         Returns:
             Term dictionary or None
         """
@@ -1877,14 +1877,14 @@ class WPClient:
                    parent: Optional[str] = None, description: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         Create a WordPress taxonomy term
-        
+
         Args:
             taxonomy: Taxonomy name
             name: Term name
             slug: Term slug (optional)
             parent: Parent term ID (optional)
             description: Term description (optional)
-            
+
         Returns:
             Created term dictionary or None
         """
@@ -1917,11 +1917,11 @@ class WPClient:
     def delete_term(self, taxonomy: str, term_id: str) -> bool:
         """
         Delete a WordPress taxonomy term
-        
+
         Args:
             taxonomy: Taxonomy name
             term_id: Term ID
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -1938,7 +1938,7 @@ class WPClient:
     def list_widgets(self) -> List[Dict[str, Any]]:
         """
         List WordPress widgets
-        
+
         Returns:
             List of widget dictionaries
         """
@@ -1956,10 +1956,10 @@ class WPClient:
     def get_widget(self, widget_id: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress widget information
-        
+
         Args:
             widget_id: Widget ID
-            
+
         Returns:
             Widget dictionary or None
         """
@@ -1977,11 +1977,11 @@ class WPClient:
     def update_widget(self, widget_id: str, options: Dict[str, str]) -> bool:
         """
         Update a WordPress widget
-        
+
         Args:
             widget_id: Widget ID
             options: Widget options to update
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -2005,7 +2005,7 @@ class WPClient:
     def list_roles(self) -> List[Dict[str, Any]]:
         """
         List WordPress user roles
-        
+
         Returns:
             List of role dictionaries
         """
@@ -2023,10 +2023,10 @@ class WPClient:
     def get_role(self, role: str) -> Optional[Dict[str, Any]]:
         """
         Get WordPress role information
-        
+
         Args:
             role: Role name
-            
+
         Returns:
             Role dictionary or None
         """
@@ -2044,12 +2044,12 @@ class WPClient:
     def create_role(self, role_key: str, role_name: str, capabilities: Optional[str] = None) -> bool:
         """
         Create a WordPress user role
-        
+
         Args:
             role_key: Role key/slug
             role_name: Role display name
             capabilities: Comma-separated list of capabilities
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -2071,42 +2071,42 @@ class WPClient:
     def delete_role(self, role: str) -> bool:
         """
         Delete a WordPress user role
-        
+
         Args:
             role: Role name
-            
+
         Returns:
             True if successful, False otherwise
         """
         try:
             cmd = f"role delete {role}"
             self._execute_wp(cmd)
-            
+
             logger.info(f"Deleted role '{role}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to delete role: {e}")
             return False
-    
+
     def scaffold_post_type(self, slug: str, label: Optional[str] = None, 
                           public: Optional[str] = None, has_archive: Optional[str] = None,
                           supports: Optional[str] = None) -> bool:
         """
         Generate a custom post type
-        
+
         Args:
             slug: Post type slug
             label: Post type label (optional)
             public: Whether public (optional)
             has_archive: Whether has archive (optional)
             supports: Supported features (optional)
-            
+
         Returns:
             True if successful, False otherwise
         """
         try:
             cmd_parts = ["scaffold", "post-type", slug]
-            
+
             if label:
                 cmd_parts.append(f"--label='{label}'")
             if public:
@@ -2115,35 +2115,35 @@ class WPClient:
                 cmd_parts.append(f"--has_archive={has_archive}")
             if supports:
                 cmd_parts.append(f"--supports={supports}")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Generated post type '{slug}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to generate post type: {e}")
             return False
-    
+
     def scaffold_taxonomy(self, slug: str, label: Optional[str] = None,
                          public: Optional[str] = None, hierarchical: Optional[str] = None,
                          post_types: Optional[str] = None) -> bool:
         """
         Generate a custom taxonomy
-        
+
         Args:
             slug: Taxonomy slug
             label: Taxonomy label (optional)
             public: Whether public (optional)
             hierarchical: Whether hierarchical (optional)
             post_types: Associated post types (optional)
-            
+
         Returns:
             True if successful, False otherwise
         """
         try:
             cmd_parts = ["scaffold", "taxonomy", slug]
-            
+
             if label:
                 cmd_parts.append(f"--label='{label}'")
             if public:
@@ -2152,68 +2152,68 @@ class WPClient:
                 cmd_parts.append(f"--hierarchical={hierarchical}")
             if post_types:
                 cmd_parts.append(f"--post_types={post_types}")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Generated taxonomy '{slug}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to generate taxonomy: {e}")
             return False
-    
+
     def scaffold_plugin(self, slug: str, plugin_name: Optional[str] = None,
                        plugin_uri: Optional[str] = None, author: Optional[str] = None) -> bool:
         """
         Generate a WordPress plugin
-        
+
         Args:
             slug: Plugin slug
             plugin_name: Plugin name (optional)
             plugin_uri: Plugin URI (optional)
             author: Plugin author (optional)
-            
+
         Returns:
             True if successful, False otherwise
         """
         try:
             cmd_parts = ["scaffold", "plugin", slug]
-            
+
             if plugin_name:
                 cmd_parts.append(f"--plugin_name='{plugin_name}'")
             if plugin_uri:
                 cmd_parts.append(f"--plugin_uri='{plugin_uri}'")
             if author:
                 cmd_parts.append(f"--author='{author}'")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Generated plugin '{slug}'")
             return True
         except WPCLIError as e:
             logger.error(f"Failed to generate plugin: {e}")
             return False
-    
+
     def scaffold_theme(self, slug: str, theme_name: Optional[str] = None,
                       theme_uri: Optional[str] = None, author: Optional[str] = None,
                       author_uri: Optional[str] = None) -> bool:
         """
         Generate a WordPress theme
-        
+
         Args:
             slug: Theme slug
             theme_name: Theme name (optional)
             theme_uri: Theme URI (optional)
             author: Theme author (optional)
             author_uri: Author URI (optional)
-            
+
         Returns:
             True if successful, False otherwise
         """
         try:
             cmd_parts = ["scaffold", "theme", slug]
-            
+
             if theme_name:
                 cmd_parts.append(f"--theme_name='{theme_name}'")
             if theme_uri:
@@ -2222,10 +2222,10 @@ class WPClient:
                 cmd_parts.append(f"--author='{author}'")
             if author_uri:
                 cmd_parts.append(f"--author_uri='{author_uri}'")
-            
+
             cmd = " ".join(cmd_parts)
             self._execute_wp(cmd)
-            
+
             logger.info(f"Generated theme '{slug}'")
             return True
         except WPCLIError as e:

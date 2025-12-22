@@ -52,11 +52,11 @@ class TestScaffoldPostType:
     def test_scaffold_post_type_success(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test successful post type scaffold"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_post_type.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['post-type', 'book'])
-        
+
         assert result.exit_code == 0
         assert 'success' in result.output.lower()
         assert 'book' in result.output
@@ -65,9 +65,9 @@ class TestScaffoldPostType:
     def test_scaffold_post_type_with_options(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test post type scaffold with options"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_post_type.return_value = True
-        
+
         result = runner.invoke(scaffold_command, [
             'post-type', 'book',
             '--label', 'Books',
@@ -75,7 +75,7 @@ class TestScaffoldPostType:
             '--has_archive', 'true',
             '--supports', 'title,editor'
         ])
-        
+
         assert result.exit_code == 0
         mock_scaffold_wp_client.scaffold_post_type.assert_called_once_with(
             'book', 'Books', 'true', 'true', 'title,editor'
@@ -84,33 +84,33 @@ class TestScaffoldPostType:
     def test_scaffold_post_type_with_server(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test post type scaffold with specific server"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_post_type.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['post-type', 'book', '--server', 'staging'])
-        
+
         assert result.exit_code == 0
         mock_scaffold_config.get_server.assert_called_once_with('staging')
 
     def test_scaffold_post_type_failure(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test post type scaffold when operation fails"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_post_type.return_value = False
-        
+
         result = runner.invoke(scaffold_command, ['post-type', 'book'])
-        
+
         assert result.exit_code == 1
         assert 'failed' in result.output.lower()
 
     def test_scaffold_post_type_error(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test post type scaffold with error"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_post_type.side_effect = Exception('Scaffold error')
-        
+
         result = runner.invoke(scaffold_command, ['post-type', 'book'])
-        
+
         assert result.exit_code == 1
         assert 'error' in result.output.lower()
 
@@ -121,11 +121,11 @@ class TestScaffoldTaxonomy:
     def test_scaffold_taxonomy_success(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test successful taxonomy scaffold"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_taxonomy.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['taxonomy', 'genre'])
-        
+
         assert result.exit_code == 0
         assert 'success' in result.output.lower()
         assert 'genre' in result.output
@@ -134,9 +134,9 @@ class TestScaffoldTaxonomy:
     def test_scaffold_taxonomy_with_options(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test taxonomy scaffold with options"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_taxonomy.return_value = True
-        
+
         result = runner.invoke(scaffold_command, [
             'taxonomy', 'genre',
             '--label', 'Genres',
@@ -144,7 +144,7 @@ class TestScaffoldTaxonomy:
             '--hierarchical', 'true',
             '--post_types', 'book'
         ])
-        
+
         assert result.exit_code == 0
         mock_scaffold_wp_client.scaffold_taxonomy.assert_called_once_with(
             'genre', 'Genres', 'true', 'true', 'book'
@@ -153,33 +153,33 @@ class TestScaffoldTaxonomy:
     def test_scaffold_taxonomy_with_server(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test taxonomy scaffold with specific server"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_taxonomy.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['taxonomy', 'genre', '--server', 'staging'])
-        
+
         assert result.exit_code == 0
         mock_scaffold_config.get_server.assert_called_once_with('staging')
 
     def test_scaffold_taxonomy_failure(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test taxonomy scaffold when operation fails"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_taxonomy.return_value = False
-        
+
         result = runner.invoke(scaffold_command, ['taxonomy', 'genre'])
-        
+
         assert result.exit_code == 1
         assert 'failed' in result.output.lower()
 
     def test_scaffold_taxonomy_error(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test taxonomy scaffold with error"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_taxonomy.side_effect = Exception('Scaffold error')
-        
+
         result = runner.invoke(scaffold_command, ['taxonomy', 'genre'])
-        
+
         assert result.exit_code == 1
         assert 'error' in result.output.lower()
 
@@ -190,11 +190,11 @@ class TestScaffoldPlugin:
     def test_scaffold_plugin_success(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test successful plugin scaffold"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_plugin.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['plugin', 'my-plugin'])
-        
+
         assert result.exit_code == 0
         assert 'success' in result.output.lower()
         assert 'my-plugin' in result.output
@@ -203,16 +203,16 @@ class TestScaffoldPlugin:
     def test_scaffold_plugin_with_options(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test plugin scaffold with options"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_plugin.return_value = True
-        
+
         result = runner.invoke(scaffold_command, [
             'plugin', 'my-plugin',
             '--plugin_name', 'My Plugin',
             '--plugin_uri', 'https://example.com',
             '--author', 'Test Author'
         ])
-        
+
         assert result.exit_code == 0
         mock_scaffold_wp_client.scaffold_plugin.assert_called_once_with(
             'my-plugin', 'My Plugin', 'https://example.com', 'Test Author'
@@ -221,33 +221,33 @@ class TestScaffoldPlugin:
     def test_scaffold_plugin_with_server(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test plugin scaffold with specific server"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_plugin.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['plugin', 'my-plugin', '--server', 'staging'])
-        
+
         assert result.exit_code == 0
         mock_scaffold_config.get_server.assert_called_once_with('staging')
 
     def test_scaffold_plugin_failure(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test plugin scaffold when operation fails"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_plugin.return_value = False
-        
+
         result = runner.invoke(scaffold_command, ['plugin', 'my-plugin'])
-        
+
         assert result.exit_code == 1
         assert 'failed' in result.output.lower()
 
     def test_scaffold_plugin_error(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test plugin scaffold with error"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_plugin.side_effect = Exception('Scaffold error')
-        
+
         result = runner.invoke(scaffold_command, ['plugin', 'my-plugin'])
-        
+
         assert result.exit_code == 1
         assert 'error' in result.output.lower()
 
@@ -258,11 +258,11 @@ class TestScaffoldTheme:
     def test_scaffold_theme_success(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test successful theme scaffold"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_theme.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['theme', 'my-theme'])
-        
+
         assert result.exit_code == 0
         assert 'success' in result.output.lower()
         assert 'my-theme' in result.output
@@ -271,9 +271,9 @@ class TestScaffoldTheme:
     def test_scaffold_theme_with_options(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test theme scaffold with options"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_theme.return_value = True
-        
+
         result = runner.invoke(scaffold_command, [
             'theme', 'my-theme',
             '--theme_name', 'My Theme',
@@ -281,7 +281,7 @@ class TestScaffoldTheme:
             '--author', 'Test Author',
             '--author_uri', 'https://author.com'
         ])
-        
+
         assert result.exit_code == 0
         mock_scaffold_wp_client.scaffold_theme.assert_called_once_with(
             'my-theme', 'My Theme', 'https://example.com', 'Test Author', 'https://author.com'
@@ -290,32 +290,32 @@ class TestScaffoldTheme:
     def test_scaffold_theme_with_server(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test theme scaffold with specific server"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_theme.return_value = True
-        
+
         result = runner.invoke(scaffold_command, ['theme', 'my-theme', '--server', 'staging'])
-        
+
         assert result.exit_code == 0
         mock_scaffold_config.get_server.assert_called_once_with('staging')
 
     def test_scaffold_theme_failure(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test theme scaffold when operation fails"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_theme.return_value = False
-        
+
         result = runner.invoke(scaffold_command, ['theme', 'my-theme'])
-        
+
         assert result.exit_code == 1
         assert 'failed' in result.output.lower()
 
     def test_scaffold_theme_error(self, mock_scaffold_wp_client, mock_scaffold_ssh, mock_scaffold_config):
         """Test theme scaffold with error"""
         runner = CliRunner()
-        
+
         mock_scaffold_wp_client.scaffold_theme.side_effect = Exception('Scaffold error')
-        
+
         result = runner.invoke(scaffold_command, ['theme', 'my-theme'])
-        
+
         assert result.exit_code == 1
         assert 'error' in result.output.lower()

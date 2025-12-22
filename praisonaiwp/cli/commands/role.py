@@ -43,7 +43,7 @@ def list_roles(server):
         client = WPClient(ssh, server_config['wp_path'])
 
         roles = client.list_roles()
-        
+
         if not roles:
             console.print("[yellow]No roles found[/yellow]")
             return
@@ -93,12 +93,12 @@ def get_role(role, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         role_info = client.get_role(role)
-        
+
         if role_info:
             console.print(f"[green]Role Information:[/green]")
             console.print(f"[cyan]Name:[/cyan] {role_info.get('name', 'N/A')}")
             console.print(f"[cyan]Display Name:[/cyan] {role_info.get('display_name', 'N/A')}")
-            
+
             # Display capabilities if available
             capabilities = role_info.get('capabilities', [])
             if capabilities:
@@ -145,7 +145,7 @@ def create_role(role_key, role_name, capabilities, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.create_role(role_key, role_name, capabilities)
-        
+
         if success:
             console.print(f"[green]Successfully created role '{role_name}' ({role_key})[/green]")
             if capabilities:
@@ -186,7 +186,7 @@ def delete_role(role, server):
         client = WPClient(ssh, server_config['wp_path'])
 
         success = client.delete_role(role)
-        
+
         if success:
             console.print(f"[green]Successfully deleted role '{role}'[/green]")
         else:
