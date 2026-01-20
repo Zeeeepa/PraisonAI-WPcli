@@ -301,6 +301,169 @@ def related(post_id, count, threshold, server, json_output, verbose):
         logger.error(f"Find related failed: {e}")
 
 
+@duplicate.command('check-batch')
+@click.argument('items', nargs=-1, required=True)
+@click.option('--threshold', type=float, default=0.7, 
+              help='Similarity threshold (0-1, default: 0.7)')
+@click.option('--duplicate-threshold', type=float, default=0.8,
+              help='Threshold to flag as definite duplicate (0-1, default: 0.8)')
+@click.option('--type', 'post_type', default='post', help='Post type to search')
+@click.option('--count', type=int, default=5, help='Number of similar posts to show')
+@click.option('--any-match', is_flag=True, default=True, 
+              help='Flag as duplicate if ANY item matches (default: True)')
+@click.option('--all-match', is_flag=True, 
+              help='Flag as duplicate only if ALL items match')
+@click.option('--server', default=None, help='Server name from config')
+@click.option('--json', 'json_output', is_flag=True, help='Output in JSON format')
+@click.option('--verbose', is_flag=True, help='Verbose output')
+def check_batch(items, threshold, duplicate_threshold, post_type, count, 
+                any_match, all_match, server, json_output, verbose):
+    """
+    Check multiple items (sentences, paragraphs) for duplicates.
+    
+    More robust than single-string checking - checks each item independently.
+    
+    Examples:
+    
+        # Check multiple sentences
+        praisonaiwp duplicate check-batch "OpenAI launches GPT-5" "AI breakthrough 2026"
+        
+        # Check from JSON list
+        echo '["sentence1", "sentence2"]' | praisonaiwp duplicate check-batch --json
+        
+        # Require ALL items to match
+        praisonaiwp duplicate check-batch "title" "content" --all-match
+    """
+    if not AI_AVAILABLE:
+        error_msg = AIFormatter.error_response(
+            "AI features not available. Install with: pip install 'praisonaiwp[ai]'",
+            command="duplicate check-batch",
+            error_code="AI_NOT_AVAILABLE"
+        )
+        click.echo(AIFormatter.format_output(error_msg, json_output))
+        return
+    
+    if not items:
+        error_msg = AIFormatter.error_response(
+            "No items provided. Pass multiple strings as arguments.",
+            command="duplicate check-batch",
+            error_code="NO_ITEMS"
+        )
+        click.echo(AIFormatter.format_output(error_msg, json_output))
+        return
+    
+    # Convert to list
+    items_list = list(items)
+    
+    try:
+        config = Config()
+        server_config = config.get_server(server)
+        
+        if verbose:
+            console.print(f"[yellow]Checking {len(items_list)} items for duplicates...[/yellow]")
+            for i, item in enumerate(items_list, 1):
+                console.print(f"  {i}. {item[:50]}...")
+        
+        with SSHManager(
+            server_config['hostname'],
+            server_config['username'],
+            server_config['key_file'],
+            server_config.get('port', 22)
+        ) as ssh:
+            wp = WPClient(
+                ssh,
+                server_config['wp_path'],
+                server_config.get('php_bin', 'php'),
+                server_config.get('wp_cli', '/usr/local/bin/wp'),
+                verify_installation=False
+            )
+            
+            from praisonaiwp.ai.duplicate_detector import DuplicateDetector
+            
+            detector = DuplicateDetector(
+                wp_client=wp,
+                threshold=threshold,
+                duplicate_threshold=duplicate_threshold,
+                verbose=1 if verbose else 0
+            )
+            
+            if verbose:
+                console.print("[cyan]Indexing posts...[/cyan]")
+            
+            indexed = detector.index_posts(post_type=post_type)
+            
+            if verbose:
+                console.print(f"[green]Indexed {indexed} posts[/green]")
+            
+            # Use all_match flag to invert any_match
+            use_any_match = not all_match
+            
+            result = detector.check_duplicates_batch(
+                items=items_list,
+                top_k=count,
+                any_match=use_any_match
+            )
+            
+            if json_output:
+                import json
+                click.echo(json.dumps(result.to_dict(), indent=2))
+            else:
+                _format_batch_result(result, items_list, verbose)
+                
+    except Exception as e:
+        error_msg = AIFormatter.error_response(
+            str(e),
+            command="duplicate check-batch",
+            error_code="BATCH_CHECK_ERROR"
+        )
+        click.echo(AIFormatter.format_output(error_msg, json_output))
+        logger.error(f"Batch duplicate check failed: {e}")
+        if verbose:
+            import traceback
+            traceback.print_exc()
+
+
+def _format_batch_result(result, items, verbose: bool = False):
+    """Format and display batch duplicate check result."""
+    console.print()
+    console.print("[bold]🔍 Batch Duplicate Check Results[/bold]")
+    console.print("=" * 50)
+    console.print(f"Items checked: {len(items)}")
+    console.print(f"Threshold: {result.threshold}")
+    console.print(f"Posts checked: {result.total_posts_checked}")
+    console.print()
+    
+    if not result.matches:
+        console.print("[green]✅ No duplicates found for any item![/green]")
+        console.print("All content appears to be unique.")
+        return
+    
+    if result.has_duplicates:
+        console.print("[red]⚠️  DUPLICATES FOUND:[/red]")
+    else:
+        console.print("[yellow]📋 Similar content found:[/yellow]")
+    
+    console.print()
+    
+    for i, match in enumerate(result.matches, 1):
+        if match.status == "duplicate":
+            status_color = "red"
+            status_icon = "🔴"
+        else:
+            status_color = "yellow"
+            status_icon = "🟡"
+        
+        console.print(f"{i}. [bold]{match.title}[/bold] (ID: {match.post_id})")
+        console.print(f"   Similarity: [{status_color}]{match.similarity_score:.2f}[/{status_color}] | Status: {status_icon} {match.status.upper()}")
+        if match.url and verbose:
+            console.print(f"   URL: {match.url}")
+        console.print()
+    
+    if result.has_duplicates:
+        console.print("[bold]Recommendation:[/bold]")
+        console.print("  One or more items match existing content. Consider updating instead of creating new.")
+
+
 def _format_related_result(post, result, verbose: bool = False):
     """Format and display related posts result."""
     console.print()

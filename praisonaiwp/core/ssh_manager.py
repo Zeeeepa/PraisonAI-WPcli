@@ -214,8 +214,23 @@ class SSHManager:
         return False
 
     def __del__(self):
-        """Cleanup on deletion"""
-        self.close()
+        """Cleanup on deletion - handles Python shutdown gracefully"""
+        try:
+            # Check if Python is shutting down
+            import sys
+            if sys.meta_path is None:
+                # Python is shutting down, just close without logging
+                if self.client:
+                    try:
+                        self.client.close()
+                    except Exception:
+                        pass
+                    self.client = None
+                return
+            self.close()
+        except Exception:
+            # Silently ignore any errors during cleanup
+            pass
 
     @staticmethod
     def from_config(config, hostname: Optional[str] = None):

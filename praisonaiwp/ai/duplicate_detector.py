@@ -6,8 +6,7 @@ Includes persistent caching to avoid re-indexing on every search.
 import hashlib
 import json
 import logging
-import os
-import sqlite3
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -60,11 +59,18 @@ class DuplicateCheckResponse:
         }
 
 
+# Singleton vector tool instance
+_VECTOR_TOOL_INSTANCE = None
+
 def _get_vector_tool():
-    """Lazy import SQLiteVectorTool from praisonai_tools."""
+    """Lazy import SQLiteVectorTool from praisonai_tools (singleton)."""
+    global _VECTOR_TOOL_INSTANCE
+    if _VECTOR_TOOL_INSTANCE is not None:
+        return _VECTOR_TOOL_INSTANCE
     try:
         from praisonai_tools import SQLiteVectorTool
-        return SQLiteVectorTool(path=str(CACHE_DB))
+        _VECTOR_TOOL_INSTANCE = SQLiteVectorTool(path=str(CACHE_DB))
+        return _VECTOR_TOOL_INSTANCE
     except ImportError:
         logger.warning("praisonai_tools not installed, falling back to local cache")
         return None
@@ -102,12 +108,13 @@ class EmbeddingCache:
     def get(self, post_id: int) -> Optional[Tuple[str, List[float], Dict]]:
         """Get cached embedding for a post."""
         if self._tool:
-            results = self._tool.get(collection="wp_posts", ids=[str(post_id)])
+            results = self._tool.get(collection="wp_posts", ids=[str(post_id)], include=["embeddings", "metadatas"])
             if results and not any("error" in r for r in results):
                 for r in results:
                     if r.get("id") == str(post_id):
                         meta = r.get("metadata") or {}
-                        return meta.get("title", ""), [], meta
+                        emb = r.get("embedding", [])
+                        return meta.get("title", ""), emb, meta
         else:
             import sqlite3
             with sqlite3.connect(self.db_path) as conn:
@@ -137,19 +144,51 @@ class EmbeddingCache:
                     VALUES (?, ?, ?, ?, ?)
                 """, (post_id, title, url, content_hash, json.dumps(embedding)))
     
+    def set_batch(self, items: List[Tuple[int, str, str, str, List[float]]]):
+        """
+        Batch insert embeddings for multiple posts.
+        
+        Args:
+            items: List of (post_id, title, url, content_hash, embedding) tuples
+        """
+        if not items:
+            return
+        
+        if self._tool:
+            # Batch add to vector tool
+            ids = [str(item[0]) for item in items]
+            documents = [item[1] for item in items]
+            embeddings = [item[4] for item in items]
+            metadatas = [{"title": item[1], "url": item[2], "content_hash": item[3]} for item in items]
+            self._tool.add(
+                collection="wp_posts",
+                documents=documents,
+                embeddings=embeddings,
+                ids=ids,
+                metadatas=metadatas
+            )
+        else:
+            import sqlite3
+            with sqlite3.connect(self.db_path) as conn:
+                conn.executemany("""
+                    INSERT OR REPLACE INTO embeddings (post_id, title, url, content_hash, embedding)
+                    VALUES (?, ?, ?, ?, ?)
+                """, [(item[0], item[1], item[2], item[3], json.dumps(item[4])) for item in items])
+    
     def get_all(self) -> List[Tuple[int, str, str, List[float]]]:
         """Get all cached embeddings."""
         if self._tool:
-            results = self._tool.get(collection="wp_posts")
+            results = self._tool.get(collection="wp_posts", include=["embeddings", "metadatas"])
             items = []
             for r in results:
                 if "error" not in r:
                     meta = r.get("metadata") or {}
+                    emb = r.get("embedding", [])
                     items.append((
                         int(r["id"]),
                         meta.get("title", ""),
                         meta.get("url", ""),
-                        []  # Embeddings not stored in get results
+                        emb
                     ))
             return items
         else:
@@ -244,12 +283,48 @@ class DuplicateDetector:
         self._indexed = False
     
     def _get_embedding(self, text: str) -> List[float]:
-        """Get embedding for text using praisonai.embedding()."""
+        """Get embedding for text using praisonai.embedding().
+        
+        Handles both old API (returns List[float]) and new API (returns EmbeddingResult).
+        """
         try:
-            import praisonai
-            return praisonai.embedding(text, model=self.embedding_model)
+            from praisonai import embedding
+            result = embedding(text, model=self.embedding_model)
+            # Handle EmbeddingResult (new API returns object with .embeddings)
+            if hasattr(result, 'embeddings'):
+                return result.embeddings[0]  # Extract first embedding vector
+            # Fallback for raw list (old API or direct litellm)
+            return result
         except Exception as e:
             logger.error(f"Embedding error: {e}")
+            raise
+    
+    def _get_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
+        """
+        Get embeddings for multiple texts in a single API call (batch).
+        
+        OpenAI supports up to 2048 inputs per batch request.
+        
+        Args:
+            texts: List of texts to embed
+            
+        Returns:
+            List of embedding vectors
+        """
+        if not texts:
+            return []
+        
+        try:
+            from praisonai import embedding
+            # OpenAI embedding API supports batch input
+            result = embedding(texts, model=self.embedding_model)
+            # Handle EmbeddingResult (new API returns object with .embeddings)
+            if hasattr(result, 'embeddings'):
+                return result.embeddings
+            # Fallback for raw list
+            return result
+        except Exception as e:
+            logger.error(f"Batch embedding error: {e}")
             raise
     
     def _content_hash(self, text: str) -> str:
@@ -279,7 +354,10 @@ class DuplicateDetector:
         post_type: str = "post",
         post_status: str = "publish",
         category: Optional[str] = None,
-        force: bool = False
+        force: bool = False,
+        parallel: bool = True,
+        max_workers: int = 25,
+        batch_size: int = 50
     ) -> int:
         """
         Index all posts for similarity search.
@@ -290,6 +368,9 @@ class DuplicateDetector:
             post_status: Status filter
             category: Category filter (optional)
             force: Force re-indexing even if cached
+            parallel: Use parallel processing for faster indexing (default: True)
+            max_workers: Number of parallel workers (default: 25)
+            batch_size: Number of posts per batch for embedding API (default: 50)
             
         Returns:
             Number of posts indexed (new + from cache)
@@ -308,7 +389,7 @@ class DuplicateDetector:
         
         logger.info(f"Fetching {post_type}s with status={post_status}...")
         
-        filters = {"post_status": post_status, "posts_per_page": 500}
+        filters = {"post_status": post_status, "posts_per_page": 2000}
         if category:
             filters["category_name"] = category
         
@@ -318,32 +399,56 @@ class DuplicateDetector:
             logger.warning("No posts found")
             return len(self._embeddings)
         
-        # Index only new posts
-        new_indexed = 0
+        # Filter to only new posts
+        new_posts = []
         for post in posts:
             post_id = post.get("ID")
-            if not post_id:
+            if not post_id or post_id in self._embeddings:
                 continue
-            
-            # Skip if already in memory
-            if post_id in self._embeddings:
-                continue
-            
             text = self._get_post_text(post)
             if not text.strip():
                 continue
+            new_posts.append({
+                "post_id": post_id,
+                "title": post.get("post_title", ""),
+                "url": post.get("guid", ""),
+                "text": text
+            })
+        
+        if not new_posts:
+            self._indexed = True
+            return len(self._embeddings)
+        
+        logger.info(f"Indexing {len(new_posts)} new posts (parallel={parallel}, workers={max_workers}, batch={batch_size})...")
+        
+        if parallel:
+            new_indexed = self._index_posts_parallel(new_posts, max_workers, batch_size)
+        else:
+            new_indexed = self._index_posts_sequential(new_posts)
+        
+        self._indexed = True
+        total = len(self._embeddings)
+        logger.info(f"Indexed {new_indexed} new posts (total: {total})")
+        if self.verbose:
+            print(f"Indexed {new_indexed} new posts (total: {total} in cache)")
+        
+        return total
+    
+    def _index_posts_sequential(self, posts: List[Dict]) -> int:
+        """Index posts sequentially (fallback method)."""
+        new_indexed = 0
+        for post in posts:
+            post_id = post["post_id"]
+            title = post["title"]
+            url = post["url"]
+            text = post["text"]
             
-            title = post.get("post_title", "")
-            url = post.get("guid", "")
-            
-            # Get embedding
             try:
                 embedding = self._get_embedding(text)
             except Exception as e:
                 logger.error(f"Failed to embed post {post_id}: {e}")
                 continue
             
-            # Store in memory and cache
             self._embeddings[post_id] = (title, url, embedding)
             if self.cache:
                 content_hash = self._content_hash(text)
@@ -353,13 +458,91 @@ class DuplicateDetector:
             if self.verbose and new_indexed % 50 == 0:
                 print(f"Indexed {new_indexed} new posts...")
         
-        self._indexed = True
-        total = len(self._embeddings)
-        logger.info(f"Indexed {new_indexed} new posts (total: {total})")
-        if self.verbose:
-            print(f"Indexed {new_indexed} new posts (total: {total} in cache)")
+        return new_indexed
+    
+    def _index_posts_parallel(self, posts: List[Dict], max_workers: int = 25, batch_size: int = 50) -> int:
+        """
+        Index posts in parallel using batch embeddings and ThreadPoolExecutor.
         
-        return total
+        Strategy:
+        1. Split posts into batches of batch_size
+        2. Process batches in parallel using ThreadPoolExecutor
+        3. Each batch uses batch embedding API for efficiency
+        4. Batch write results to cache
+        
+        Args:
+            posts: List of post dicts with post_id, title, url, text
+            max_workers: Number of parallel workers
+            batch_size: Posts per batch for embedding API
+            
+        Returns:
+            Number of posts indexed
+        """
+        import time
+        start_time = time.time()
+        
+        # Split into batches
+        batches = [posts[i:i + batch_size] for i in range(0, len(posts), batch_size)]
+        logger.info(f"Processing {len(posts)} posts in {len(batches)} batches with {max_workers} workers...")
+        
+        if self.verbose:
+            print(f"Processing {len(posts)} posts in {len(batches)} batches...")
+        
+        results = []
+        errors = 0
+        
+        def process_batch(batch: List[Dict]) -> List[Tuple[int, str, str, str, List[float]]]:
+            """Process a single batch of posts."""
+            texts = [p["text"] for p in batch]
+            try:
+                embeddings = self._get_embeddings_batch(texts)
+                batch_results = []
+                for i, post in enumerate(batch):
+                    if i < len(embeddings):
+                        content_hash = self._content_hash(post["text"])
+                        batch_results.append((
+                            post["post_id"],
+                            post["title"],
+                            post["url"],
+                            content_hash,
+                            embeddings[i]
+                        ))
+                return batch_results
+            except Exception as e:
+                logger.error(f"Batch embedding failed: {e}")
+                return []
+        
+        # Process batches in parallel
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(process_batch, batch): i for i, batch in enumerate(batches)}
+            
+            completed = 0
+            for future in as_completed(futures):
+                batch_idx = futures[future]
+                try:
+                    batch_results = future.result()
+                    results.extend(batch_results)
+                    completed += 1
+                    if self.verbose and completed % 5 == 0:
+                        print(f"Completed {completed}/{len(batches)} batches...")
+                except Exception as e:
+                    logger.error(f"Batch {batch_idx} failed: {e}")
+                    errors += 1
+        
+        # Store results in memory
+        for post_id, title, url, content_hash, embedding in results:
+            self._embeddings[post_id] = (title, url, embedding)
+        
+        # Batch write to cache
+        if self.cache and results:
+            self.cache.set_batch(results)
+        
+        elapsed = time.time() - start_time
+        logger.info(f"Parallel indexing completed: {len(results)} posts in {elapsed:.1f}s ({errors} errors)")
+        if self.verbose:
+            print(f"Indexed {len(results)} posts in {elapsed:.1f}s")
+        
+        return len(results)
     
     def check_duplicate(
         self,
@@ -417,6 +600,107 @@ class DuplicateDetector:
             query=query[:100] + "..." if len(query) > 100 else query,
             threshold=self.threshold,
             matches=matches,
+            total_posts_checked=len(self._embeddings),
+            has_duplicates=has_duplicates
+        )
+    
+    def check_duplicates_batch(
+        self,
+        items: List[str],
+        exclude_post_id: Optional[int] = None,
+        top_k: int = 5,
+        any_match: bool = True
+    ) -> DuplicateCheckResponse:
+        """
+        Check multiple items (sentences, paragraphs, titles) for duplicates.
+        
+        This is more robust than single-string checking because it checks
+        each item independently and aggregates results.
+        
+        Args:
+            items: List of strings to check (sentences, paragraphs, titles)
+            exclude_post_id: Post ID to exclude from results
+            top_k: Number of top matches to return per item
+            any_match: If True, return has_duplicates=True if ANY item matches.
+                      If False, require ALL items to match.
+        
+        Returns:
+            DuplicateCheckResponse with aggregated results
+        
+        Example:
+            # Check multiple sentences
+            result = detector.check_duplicates_batch([
+                "OpenAI launches new model",
+                "GPT-5 announced at conference",
+                "AI breakthrough in 2026"
+            ])
+        """
+        if not self._indexed:
+            self.index_posts()
+        
+        if not items:
+            return DuplicateCheckResponse(
+                query="(empty batch)",
+                threshold=self.threshold,
+                matches=[],
+                total_posts_checked=len(self._embeddings),
+                has_duplicates=False
+            )
+        
+        # Track all matches across items
+        all_matches: Dict[int, DuplicateResult] = {}
+        items_with_duplicates = 0
+        
+        for item in items:
+            if not item or not item.strip():
+                continue
+            
+            query_embedding = self._get_embedding(item.strip())
+            
+            for post_id, (post_title, url, embedding) in self._embeddings.items():
+                if exclude_post_id and post_id == exclude_post_id:
+                    continue
+                
+                score = cosine_similarity(query_embedding, embedding)
+                
+                if score < self.threshold:
+                    continue
+                
+                is_duplicate = score >= self.duplicate_threshold
+                
+                # Update if this is a higher score for this post
+                if post_id not in all_matches or score > all_matches[post_id].similarity_score:
+                    status = "duplicate" if is_duplicate else "similar"
+                    all_matches[post_id] = DuplicateResult(
+                        is_duplicate=is_duplicate,
+                        similarity_score=score,
+                        post_id=post_id,
+                        title=post_title,
+                        url=url,
+                        status=status
+                    )
+            
+            # Check if this item found duplicates
+            item_result = self.check_duplicate(content=item, exclude_post_id=exclude_post_id, top_k=1)
+            if item_result.has_duplicates:
+                items_with_duplicates += 1
+        
+        # Sort by similarity score
+        sorted_matches = sorted(all_matches.values(), key=lambda x: x.similarity_score, reverse=True)
+        top_matches = sorted_matches[:top_k]
+        
+        # Determine if has duplicates based on any_match flag
+        if any_match:
+            has_duplicates = any(m.is_duplicate for m in top_matches)
+        else:
+            has_duplicates = items_with_duplicates == len([i for i in items if i and i.strip()])
+        
+        query_summary = f"Batch check: {len(items)} items"
+        
+        return DuplicateCheckResponse(
+            query=query_summary,
+            threshold=self.threshold,
+            matches=top_matches,
             total_posts_checked=len(self._embeddings),
             has_duplicates=has_duplicates
         )
