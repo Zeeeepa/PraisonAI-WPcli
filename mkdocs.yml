@@ -3,8 +3,8 @@ site_description: AI-powered WordPress content management via WP-CLI over SSH
 site_author: Mervin Praison
 site_url: https://mervinpraison.github.io/PraisonAI-WPcli/
 
-repo_name: MervinPraison/praisonaiwp
-repo_url: https://github.com/MervinPraison/praisonaiwp
+repo_name: MervinPraison/PraisonAI-WPcli
+repo_url: https://github.com/MervinPraison/PraisonAI-WPcli
 edit_uri: edit/main/mkdocs-docs/
 
 docs_dir: mkdocs-docs
@@ -40,8 +40,9 @@ theme:
     - content.tabs.link
   icon:
     repo: fontawesome/brands/github
-  logo: assets/logo.png
-  favicon: assets/favicon.png
+    logo: material/wordpress
+  # logo: assets/logo.png  # TODO: Add logo.png to mkdocs-docs/assets/
+  # favicon: assets/favicon.png  # TODO: Add favicon.png to mkdocs-docs/assets/
 
 plugins:
   - search
